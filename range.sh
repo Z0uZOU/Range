@@ -1114,7 +1114,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOUBLONS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
-echo " ...  scan en cours"
+echo " ..  scan en cours"
 find "/mnt" -path '/mnt/sd*' -type f -iname '*[avi|mp4|mkv|divx]' >mes_medias.txt &
 pid=$!
 spin='-\|/'
@@ -1129,9 +1129,7 @@ printf "\r"
 sed -i '/\.srt/d' mes_medias.txt
 sed -i 's/\.[^.]*$//' mes_medias.txt
 sed -i '/\/Plex\//!d' mes_medias.txt
-#sed -i '/\/mnt\//d' mes_medias.txt
 sed -i '/desktop/d' mes_medias.txt
-#perl -pe 's/\..*$//;s{^.*/}{}' mes_medias.txt > medias.txt
 sed -i 's/.*\///' mes_medias.txt
 sort mes_medias.txt | uniq -cd > mes_doublons.txt
 mes_doublons=`cat mes_doublons.txt`
@@ -1145,9 +1143,9 @@ else
 fi
 if [[ "$mes_doublons" != "" ]]; then
   maj_necessaire="1"
-  echo " ...  mise à jour de la base de donnée"
+  echo " ..  mise à jour de la base de donnée"
   updatedb
-  echo "... base de donnée mise à jour"
+  echo " ..  base de donnée mise à jour"
   sed -i 's/^[ \t]*//' mes_doublons.txt
   sed -i 's/[^ ]* //' mes_doublons.txt
   sed -i '/desktop/d' mes_doublons.txt
@@ -1156,7 +1154,7 @@ if [[ "$mes_doublons" != "" ]]; then
   mes_medias+=("$REPLY")
   done <mes_doublons.txt
   rm -f mes_doublons.txt
-  echo " ...  traitement des doublons"
+  echo " ..  traitement des doublons"
   for i in "${mes_medias[@]}"; do
     echo -e "[\e[41m  \e[0m] Média trouvé: "$i
     locate -ir "$i" > mon_doublon.txt
@@ -1197,7 +1195,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOSSIERS VIDES  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
-echo " ...  scan en cours"
+echo " ..  scan en cours"
 find "/mnt/" -depth -path '/mnt/sd*' -type d -empty | sed '/\/Plex\//!d' > dossiers_vides.txt &
 pid=$!
 spin='-\|/'
