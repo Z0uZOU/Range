@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.5" #base du système de mise à jour
+version="Version: 2.0.0.6" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -419,8 +419,8 @@ if [[ "$compare" != "" ]] ; then
     eval 'echo -e "$mui_update_available"' $mon_log_perso
     eval 'echo -e "$mui_update_download"' $mon_log_perso
   else
-    echo "une mise à jour est disponible ($version_distante) - version actuelle: $version_locale"
-    echo "téléchargement de la mise à jour et installation..."
+    eval 'echo "une mise à jour est disponible ($version_distante) - version actuelle: $version_locale"' $mon_log_perso
+    eval 'echo "téléchargement de la mise à jour et installation..."' $mon_log_perso
   fi
   touch $mon_script_updater
   chmod +x $mon_script_updater
@@ -466,7 +466,7 @@ else
       before=`eval printf "%0.s-" {1..$before_after_count}`
       after=`eval printf "%0.s-" {1..$before_after_count}`
     fi
-    printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_title" "$after"
+    eval 'printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_title" "$after"' $mon_log_perso
   else
     eval 'echo -e "\e[43m-- $mon_script_base_maj - VERSION: $version_locale --\e[0m"' $mon_log_perso
   fi
@@ -587,7 +587,7 @@ if [[ "$script_cron" != "" ]]; then
           before=`eval printf "%0.s-" {1..$before_after_count}`
           after=`eval printf "%0.s-" {1..$before_after_count}`
         fi
-        printf "\e[101m%s%s%s\e[0m\n" "$before" "$mui_script_in_cron" "$after"
+        eval 'printf "\e[101m%s%s%s\e[0m\n" "$before" "$mui_script_in_cron" "$after"' $mon_log_perso
       else
         eval 'echo -e "\e[101mLE SCRIPT EST PRÉSENT DANS LE CRON\e[0m"' $mon_log_perso
       fi
@@ -612,7 +612,7 @@ if [[ -f $mon_script_config ]] ; then
       before=`eval printf "%0.s-" {1..$before_after_count}`
       after=`eval printf "%0.s-" {1..$before_after_count}`
     fi
-    printf "\e[42m%s%s%s\e[0m\n" "$before" "$mui_conf_ok" "$after"
+    eval 'printf "\e[42m%s%s%s\e[0m\n" "$before" "$mui_conf_ok" "$after"' $mon_log_perso
   else
     eval 'echo -e "\e[42mLE FICHIER CONF EST PRESENT\e[0m"' $mon_log_perso
   fi
@@ -632,7 +632,7 @@ else
       before=`eval printf "%0.s-" {1..$before_after_count}`
       after=`eval printf "%0.s-" {1..$before_after_count}`
     fi
-    printf "\e[42m%s%s%s\e[0m\n" "$before" "$mui_no_conf_missing" "$after"
+    eval 'printf "\e[42m%s%s%s\e[0m\n" "$before" "$mui_no_conf_missing" "$after"' $mon_log_perso
     my_title_count=`echo -n "$mui_no_conf_creating" | sed "s/\\\e\[[0-9]\{1,2\}m//g" | wc -c`
     line_lengh="78"
     before_after_count=$(bc -l <<<"scale=1; ( $line_lengh - $my_title_count ) / 2")
@@ -646,7 +646,7 @@ else
       before=`eval printf "%0.s-" {1..$before_after_count}`
       after=`eval printf "%0.s-" {1..$before_after_count}`
     fi
-    printf "\e[42m%s%s%s\e[0m\n" "$before" "$mui_no_conf_creating" "$after"
+    eval 'printf "\e[42m%s%s%s\e[0m\n" "$before" "$mui_no_conf_creating" "$after"' $mon_log_perso
   else
     eval 'echo -e "\e[41mLE FICHIER CONF EST ABSENT\e[0m"' $mon_log_perso
     eval 'echo "-- Création du fichier conf..."' $mon_log_perso
@@ -766,9 +766,9 @@ EOT
     eval 'echo -e "$mui_no_conf_edit"' $mon_log_perso
     eval 'echo -e "$mui_no_conf_help"' $mon_log_perso
   else
-    eval 'echo "-- Fichier conf créé"'
-    eval 'echo "Vous dever éditer le fichier \"$mon_script_config\" avant de poursuivre"'
-    eval 'echo "Vous pouvez utiliser: ./"$mon_script_fichier" --edit-config"'
+    eval 'echo "-- Fichier conf créé"' $mon_log_perso
+    eval 'echo "Vous dever éditer le fichier \"$mon_script_config\" avant de poursuivre"' $mon_log_perso
+    eval 'echo "Vous pouvez utiliser: ./"$mon_script_fichier" --edit-config"' $mon_log_perso
   fi
   rm $pid_script
   exit 1
@@ -790,9 +790,9 @@ if [[ -f "$mon_script_ini" ]] ; then
       before=`eval printf "%0.s-" {1..$before_after_count}`
       after=`eval printf "%0.s-" {1..$before_after_count}`
     fi
-    printf "\e[42m%s%s%s\e[0m\n" "$before" "$mui_ini_ok" "$after"
+    eval 'printf "\e[42m%s%s%s\e[0m\n" "$before" "$mui_ini_ok" "$after"' $mon_log_perso
   else
-    echo -e "\e[42mLE FICHIER INI EST PRESENT\e[0m"
+    eval 'echo -e "\e[42mLE FICHIER INI EST PRESENT\e[0m"' $mon_log_perso
   fi
 else
   if [[ "$CHECK_MUI" != "" ]]; then
@@ -800,8 +800,8 @@ else
     eval 'echo -e "$mui_ini_missing"' $mon_log_perso
     eval 'echo -e "$mui_ini_creating"' $mon_log_perso
   else
-    echo -e "\e[41mLE FICHIER INI EST ABSENT\e[0m"
-    echo "-- Création du fichier ini..."
+    eval 'echo -e "\e[41mLE FICHIER INI EST ABSENT\e[0m"' $mon_log_perso
+    eval 'echo "-- Création du fichier ini..."' $mon_log_perso
   fi
   touch $mon_script_ini
   chmod 777 $mon_script_ini
@@ -809,7 +809,7 @@ else
     source $mon_script_langue
     eval 'echo -e "$mui_ini_created"' $mon_log_perso
   else
-    echo "-- Fichier ini créé"
+    eval 'echo "-- Fichier ini créé"' $mon_log_perso
   fi
 fi
 
@@ -968,12 +968,12 @@ maj_necessaire="0"
 ## Vérification de Java
 java_local=`java -version 2>&1 >/dev/null | grep 'java version' | awk '{print $3}' | sed -e 's/"//g'`
 if [[ "$java_local" == "" ]]; then
-  echo -e "[\e[41m\u2717 \e[0m] Java est nécessaire... lancement de l'installation"
+  eval 'echo -e "[\e[41m\u2717 \e[0m] Java est nécessaire... installation lancée"' $mon_log_perso
   java_repo=`add-apt-repository ppa:webupd8team/java`
   java_update=`apt update`
   java_install=`apt install oracle-java8-installer -y`
 else
-  echo -e "[\e[42m\u2713 \e[0m] Java est installé ("$java_local")"
+  eval 'echo -e "[\e[42m\u2713 \e[0m] Java est installé ("$java_local")"' $mon_log_perso
 fi
 
 #### Détection des variables (download_auto*)
@@ -994,15 +994,15 @@ for verif_config in $mes_dossiers_auto ; do
   cible=${!cible_var}
   if [[ "$source" != "" ]]; then
     if [[ "$cible" != "" ]]; then
-      echo -e "[\e[42m\u2713 \e[0m] $source \u2192 $cible"
+      eval 'echo -e "[\e[42m\u2713 \e[0m] $source \u2192 $cible"' $mon_log_perso
     else
-      echo -e "[\e[41m\u2717 \e[0m] Soucis de configuration"
+      eval 'echo -e "[\e[41m\u2717 \e[0m] Soucis de configuration"' $mon_log_perso
     fi
   else
     if [[ "$cible" == "" ]]; then
       useless="1"
     else
-      echo -e "[\e[41m\u2717 \e[0m] Soucis de configuration"
+      eval 'echo -e "[\e[41m\u2717 \e[0m] Soucis de configuration"' $mon_log_perso
     fi
   fi
 done
@@ -1019,9 +1019,9 @@ for dossier in $mes_dossiers_auto ; do
   if [[ "$dossier_actuel" != "" ]]; then
     if [[ -d "$dossier_actuel" ]]; then
       chmod 777 -R "$dossier_actuel"
-      echo -e "[\e[42m\u2713 \e[0m] Source: "$dossier_actuel
+      eval 'echo -e "[\e[42m\u2713 \e[0m] Source: "$dossier_actuel' $mon_log_perso
     else
-      echo -e "[\e[41m\u2717 \e[0m] Source: "$dossier_actuel
+      eval 'echo -e "[\e[41m\u2717 \e[0m] Source: "$dossier_actuel' $mon_log_perso
     fi
   fi
 done
@@ -1034,12 +1034,12 @@ for dossier in $mes_dossiers_auto ; do
     if [[ -d "$dossier_actuel" ]]; then
       chmod 777 -R "$dossier_actuel"
       cible_hdd=`df -Hl "$dossier_actuel" | grep '/dev/' | awk '{print $4}' | sed 's/M/ Mo/' | sed 's/T/ To/' | sed 's/G/ Go/'`
-      echo -e "[\e[42m\u2713 \e[0m] Cible: "$dossier_actuel "("$cible_hdd")"
+      eval 'echo -e "[\e[42m\u2713 \e[0m] Cible: "$dossier_actuel "("$cible_hdd")"' $mon_log_perso
     else
       mkdir -p "$dossier_actuel"
       chmod 777 -R "$dossier_actuel"
       cible_hdd=`df -Hl "$dossier_actuel" | grep '/dev/' | awk '{print $4}' | sed 's/M/ Mo/' | sed 's/T/ To/' | sed 's/G/ Go/'`
-      echo -e "[\e[41m\u2717 \e[0m] Cible: "$dossier_actuel" ("$cible_hdd")  (Création du dossier)"
+      eval 'echo -e "[\e[41m\u2717 \e[0m] Cible: "$dossier_actuel" ("$cible_hdd") (Création du dossier)"' $mon_log_perso
     fi
   fi
 done
@@ -1076,7 +1076,7 @@ for dossier in $mes_dossiers_auto ; do
     done <tmpfile
     rm -f tmpfile
     if [[ "${mes_medias[@]}" != "" ]]; then
-      echo -e "[\e[42m\u2713 \e[0m] Traitement en cours dans "$dossier_source
+      eval 'echo -e "[\e[42m\u2713 \e[0m] Traitement en cours dans "$dossier_source' $mon_log_perso
       maj_necessaire="1"
       filebot -script fn:amc --db $agent -non-strict --conflict override --lang fr --encoding UTF-8 --mode rename "$dossier_source" --def "$format=$dossier_cible/$output" > filebot.txt 2>/dev/null &
       pid=$!
@@ -1098,11 +1098,11 @@ for dossier in $mes_dossiers_auto ; do
       for h in "${media_fait[@]}"; do
         filebot_source=`echo $h | grep "MOVE" | cut -d'[' -f3 | sed 's/].*//g'`
         filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f4 | sed 's/].*//g'`
-        echo "    fichier: "$filebot_source
-        echo "    ... renommé/déplacé: "$filebot_cible
+        eval 'echo "    fichier: "$filebot_source' $mon_log_perso
+        eval 'echo "    ... renommé/déplacé: "$filebot_cible' $mon_log_perso
       done
     else
-      echo -e "[\e[41m\u2717 \e[0m] Aucun média détecté dans "$dossier_source
+      eval 'echo -e "[\e[41m\u2717 \e[0m] Aucun média détecté dans "$dossier_source' $mon_log_perso
     fi
   fi
 done
@@ -1114,7 +1114,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOUBLONS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
-echo " ..  scan en cours"
+eval 'echo " ..  scan en cours"' $mon_log_perso
 find "/mnt" -path '/mnt/sd*' -type f -iname '*[avi|mp4|mkv|divx]' >mes_medias.txt &
 pid=$!
 spin='-\|/'
@@ -1136,15 +1136,15 @@ mes_doublons=`cat mes_doublons.txt`
 nombre_doublon=`wc -l < mes_doublons.txt`
 rm mes_medias.txt
 if [[ "$mes_doublons" == "" ]]; then
-  echo -e "[\e[42m\u2713 \e[0m] Aucun doublon n'a été détecté"
+  eval 'echo -e "[\e[42m\u2713 \e[0m] Aucun doublon détecté"' $mon_log_perso
 else
-  echo -e "[\e[41m\u2717 \e[0m] Des doublons ont été détectés ("$nombre_doublon")"
+  eval 'echo -e "[\e[41m\u2717 \e[0m] Des doublons ont été détectés ("$nombre_doublon")"' $mon_log_perso
 fi
 if [[ "$mes_doublons" != "" ]]; then
   maj_necessaire="1"
-  echo " ..  mise à jour de la base de donnée"
+  eval 'echo " ..  mise à jour de la base de donnée"' $mon_log_perso
   updatedb
-  echo " ..  base de donnée mise à jour"
+  eval 'echo " ..  base de donnée mise à jour"' $mon_log_perso
   sed -i 's/^[ \t]*//' mes_doublons.txt
   sed -i 's/[^ ]* //' mes_doublons.txt
   sed -i '/desktop/d' mes_doublons.txt
@@ -1155,7 +1155,7 @@ if [[ "$mes_doublons" != "" ]]; then
   rm -f mes_doublons.txt
   echo " ..  traitement des doublons"
   for i in "${mes_medias[@]}"; do
-    echo -e "[\e[41m  \e[0m] Média trouvé: "$i
+    eval 'echo -e "[\e[41m  \e[0m] Média trouvé: "$i' $mon_log_perso
     locate -ir "$i" > mon_doublon.txt
     sed -i '/\.srt/d' mon_doublon.txt
     sed -i '/\/Plex\//!d' mon_doublon.txt
@@ -1164,20 +1164,20 @@ if [[ "$mes_doublons" != "" ]]; then
     mon_media+=("$REPLY")
     done <mon_doublon.txt
     for j in "${mon_media[@]}"; do
-      echo "     ... chemin: "$j
+      eval 'echo "     ... chemin: "$j' $mon_log_perso
     done
     while read -r line; do
     stat -c '%Y %n' "$line"
     done < mon_doublon.txt | sort -n -r | sed -n '1p' | sed 's/[^ ]* //' > bon.txt
     plus_recent=`cat bon.txt`
-    echo "     ... le plus récent: "$plus_recent
+    eval 'echo "     ... le plus récent: "$plus_recent' $mon_log_perso
     grep -v "$plus_recent" mon_doublon.txt > a_supprimer.txt
     a_supprimer=()
     while IFS= read -r -d $'\n'; do
     a_supprimer+=("$REPLY")
     done <a_supprimer.txt
     for k in "${a_supprimer[@]}"; do
-      echo "     ... suppression de: "$k
+      eval 'echo "     ... suppression de: "$k' $mon_log_perso
       rm -f "$k"
     done
     rm -f /opt/scripts/mes_doublons.txt
@@ -1212,14 +1212,14 @@ while IFS= read -r -d $'\n'; do
 done <dossiers_vides.txt
 rm dossiers_vides.txt
 if [[ "${dossiers_vides[@]}" != "" ]]; then
-  echo -e "[\e[42m\u2713 \e[0m] Des dossiers vides ont été détectés"
+  eval 'echo -e "[\e[42m\u2713 \e[0m] Des dossiers vides ont été détectés"' $mon_log_perso
   for l in "${dossiers_vides[@]}"; do
-    echo "     dossier: "$l
+    eval 'echo "     dossier: "$l' $mon_log_perso
     rmdir "$l"
-    echo "     ... suppression effectuée"
+    eval 'echo "     ... suppression effectuée"' $mon_log_perso
   done
 else
-  echo -e "[\e[41m\u2717 \e[0m] Aucun dossier vide n'a été détecté"
+  eval 'echo -e "[\e[41m\u2717 \e[0m] Aucun dossier vide détecté"' $mon_log_perso
 fi
 
 #### Mise à jour de Plex
@@ -1231,18 +1231,18 @@ else
 fi
 verification_plex=`wget -q -O- http://localhost:32400/web | grep "<title>Plex</title>"`
 if [[ "$verification_plex" != "" ]]; then
-  echo -e "[\e[42m\u2713 \e[0m] Serveur Plex en fonctionnement"
+  eval 'echo -e "[\e[42m\u2713 \e[0m] Serveur Plex en fonctionnement"' $mon_log_perso
   if [[ "$maj_necessaire" == "1" ]]; then
-    echo -e "[\e[42m\u2713 \e[0m] Mise à jour de la librairie en cours"
+    eval 'echo -e "[\e[42m\u2713 \e[0m] Mise à jour de la librairie en cours"' $mon_log_perso
     cd /root
     url_refresh=`echo "http://127.0.0.1:32400/library/sections/all/refresh?X-Plex-Token="$token`
     wget -q "$url_refresh"
     rm -rf refresh?X-Plex-Token=$token
   else
-    echo -e "[\e[41m\u2717 \e[0m] Aucun nouveau média, mise à jour de librairie pas nécessaire"
+    eval 'echo -e "[\e[41m\u2717 \e[0m] Aucun nouveau média, mise à jour de librairie pas nécessaire"' $mon_log_perso
   fi
 else
-  echo -e "[\e[41m\u2717 \e[0m] Le serveur Plex n'est pas lancé"
+  eval 'echo -e "[\e[41m\u2717 \e[0m] Serveur Plex pas lancé"' $mon_log_perso
 fi
 
 
@@ -1264,7 +1264,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
       before=`eval printf "%0.s-" {1..$before_after_count}`
       after=`eval printf "%0.s-" {1..$before_after_count}`
   fi
-  printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_end_of_script" "$after"
+  eval 'printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_end_of_script" "$after"' $mon_log_perso
 else
   eval 'echo -e "\e[43m -- FIN DE SCRIPT: $fin_script -- \e[0m "' $mon_log_perso
 fi
