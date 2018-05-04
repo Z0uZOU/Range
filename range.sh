@@ -1139,7 +1139,6 @@ if [[ "$mes_doublons" == "" ]]; then
   echo -e "[\e[42m\u2713 \e[0m] Aucun doublon n'a été détecté"
 else
   echo -e "[\e[41m\u2717 \e[0m] Des doublons ont été détectés ("$nombre_doublon")"
-  #cat mes_doublons.txt
 fi
 if [[ "$mes_doublons" != "" ]]; then
   maj_necessaire="1"
@@ -1165,20 +1164,20 @@ if [[ "$mes_doublons" != "" ]]; then
     mon_media+=("$REPLY")
     done <mon_doublon.txt
     for j in "${mon_media[@]}"; do
-      echo "    ... chemin: "$j
+      echo "     ... chemin: "$j
     done
     while read -r line; do
     stat -c '%Y %n' "$line"
     done < mon_doublon.txt | sort -n -r | sed -n '1p' | sed 's/[^ ]* //' > bon.txt
     plus_recent=`cat bon.txt`
-    echo "    ... le plus récent: "$plus_recent
+    echo "     ... le plus récent: "$plus_recent
     grep -v "$plus_recent" mon_doublon.txt > a_supprimer.txt
     a_supprimer=()
     while IFS= read -r -d $'\n'; do
     a_supprimer+=("$REPLY")
     done <a_supprimer.txt
     for k in "${a_supprimer[@]}"; do
-      echo "    ... suppression de: "$k
+      echo "     ... suppression de: "$k
       rm -f "$k"
     done
     rm -f /opt/scripts/mes_doublons.txt
@@ -1215,9 +1214,9 @@ rm dossiers_vides.txt
 if [[ "${dossiers_vides[@]}" != "" ]]; then
   echo -e "[\e[42m\u2713 \e[0m] Des dossiers vides ont été détectés"
   for l in "${dossiers_vides[@]}"; do
-    echo "    dossier: "$l
+    echo "     dossier: "$l
     rmdir "$l"
-    echo "    ... suppression effectuée"
+    echo "     ... suppression effectuée"
   done
 else
   echo -e "[\e[41m\u2717 \e[0m] Aucun dossier vide n'a été détecté"
