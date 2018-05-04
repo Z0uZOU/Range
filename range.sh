@@ -994,7 +994,7 @@ for verif_config in $mes_dossiers_auto ; do
   cible=${!cible_var}
   if [[ "$source" != "" ]]; then
     if [[ "$cible" != "" ]]; then
-      echo -e "[\e[42m\u2705 \e[0m] $source \u2192 $cible"
+      echo -e "[\e[42m\u2713 \e[0m] $source \u2192 $cible"
     else
       echo -e "[\e[41m\u2717 \e[0m] Soucis de configuration"
     fi
