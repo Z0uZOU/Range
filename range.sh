@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.3" #base du système de mise à jour
+version="Version: 2.0.0.1" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -669,7 +669,7 @@ script_url=""
 #### Affichage de la section dépendances
 ## mettre oui/non
 affiche_dependances="non"
-
+ 
 ##### Paramètres
 ## Sources
 download_auto_films_hd=""
@@ -691,17 +691,17 @@ cible_auto_series_dvdrip=""
 cible_auto_animation_hdtv=""
 cible_auto_animation_dvdrip=""
 cible_auto_series_vostfr=""
-
+ 
 #### Token de Plex
 token=""
-
+ 
 #### Paramètre du push
 ## ces réglages se trouvent sur le site http://www.pushover.net
 token_app=""
 destinataire_1=""
 destinataire_2=""
 titre_push=""
-
+ 
 ####################################
 ## Fin de configuration
 ####################################
@@ -718,11 +718,11 @@ maj_force="non"
  
 #### Full path to script's source (for updates)
 script_url=""
-
+ 
 #### Display the dependencies checking
 ## use yes/no
 display_dependencies="no"
-
+ 
 ##### Paramètres
 ## From
 download_auto_films_hd=""
@@ -744,17 +744,17 @@ cible_auto_series_dvdrip=""
 cible_auto_animation_hdtv=""
 cible_auto_animation_dvdrip=""
 cible_auto_series_vostfr=""
-
+ 
 #### Plex's Token
 token=""
-
+ 
 #### Paramètre du push
 ## ces réglages se trouvent sur le site http://www.pushover.net
 token_app=""
 destinataire_1=""
 destinataire_2=""
 titre_push=""
-
+ 
 ####################################
 ## Fin de configuration
 ####################################
@@ -996,13 +996,13 @@ for verif_config in $mes_dossiers_auto ; do
     if [[ "$cible" != "" ]]; then
       echo -e "[\e[42m\u2705 \e[0m] $source \u2192 $cible"
     else
-      echo -e "[\e[41m  \e[0m] Soucis de configuration"
+      echo -e "[\e[41m\u2717 \e[0m] Soucis de configuration"
     fi
   else
     if [[ "$cible" == "" ]]; then
       useless="1"
     else
-      echo -e "[\e[41m  \e[0m] Soucis de configuration"
+      echo -e "[\e[41m\u2717 \e[0m] Soucis de configuration"
     fi
   fi
 done
@@ -1017,8 +1017,12 @@ fi
 for dossier in $mes_dossiers_auto ; do
   dossier_actuel=${!dossier}
   if [[ "$dossier_actuel" != "" ]]; then
-    chmod 777 -R "$dossier_actuel"
-    echo -e "[\e[42m\u2713 \e[0m] Source: "$dossier_actuel
+    if [[ -d "$dossier_actuel" ]]; then
+      chmod 777 -R "$dossier_actuel"
+      echo -e "[\e[42m\u2713 \e[0m] Source: "$dossier_actuel
+    else
+      echo -e "[\e[41m\u2717 \e[0m] Source: "$dossier_actuel
+    fi
   fi
 done
 
@@ -1027,8 +1031,12 @@ for dossier in $mes_dossiers_auto ; do
   dossier_var=`echo $dossier | sed -e 's/download/cible/g'`
   dossier_actuel=${!dossier_var}
   if [[ "$dossier_actuel" != "" ]]; then
-    chmod 777 -R "$dossier_actuel"
-    echo -e "[\e[42m\u2713 \e[0m] Cible: "$dossier_actuel
+    if [[ -d "dossier_actuel" ]]; then
+      chmod 777 -R "$dossier_actuel"
+      echo -e "[\e[42m\u2713 \e[0m] Cible: "$dossier_actuel
+    else
+      echo -e "[\e[41m\u2717 \e[0m] Cible: "$dossier_actuel
+    fi
   fi
 done
 
@@ -1043,9 +1051,13 @@ for dossier in $mes_dossiers_auto ; do
   dossier_var=`echo $dossier | sed -e 's/download/cible/g'`
   dossier_actuel=${!dossier_var}
   if [[ "$dossier_actuel" != "" ]]; then
-    cible_hdd=`df "$dossier_actuel" | sed -n '2p' | awk '{print $4}'`
-    cible_hdd_go=$(($cible_hdd / 1048576))
-    echo -e "[\e[42m\u2713 \e[0m] "$dossier_actuel" : "$cible_hdd_go" Go"
+    if [[ -d "dossier_actuel"]]; then
+      cible_hdd=`df "$dossier_actuel" | sed -n '2p' | awk '{print $4}'`
+      cible_hdd_go=$(($cible_hdd / 1048576))
+      echo -e "[\e[42m\u2713 \e[0m] "$dossier_actuel" : "$cible_hdd_go" Go"
+    else
+      echo -e "[\e[41m\u2717 \e[0m] "$dossier_actuel" : \u2717"
+    fi
   fi
 done
 
