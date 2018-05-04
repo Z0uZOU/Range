@@ -1045,6 +1045,12 @@ for dossier in $mes_dossiers_auto ; do
 done
 
 ## Envoie à FileBot
+if [[ "$CHECK_MUI" != "" ]]; then
+  source $mon_script_langue
+  eval 'printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-62s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_filebot"' $mon_log_perso
+else
+  eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mVERIFICATION DE FILEBOT  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
+fi
 echo -e "\e[42mVERIFICATION DE FILEBOT:\e[0m"
 for dossier in $mes_dossiers_auto ; do
   source_actuelle=${!dossier}
