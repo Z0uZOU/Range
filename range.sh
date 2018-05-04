@@ -823,7 +823,7 @@ if [[ "$display_dependencies" == "yes" ]] || [[ "$affiche_dependances" == "oui" 
   ##########################
   if [[ "$CHECK_MUI" != "" ]]; then
     source $mon_script_langue
-    eval 'echo -e "$mui_section_dependencies"' $mon_log_perso
+    eval 'printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-63s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_dependencies"' $mon_log_perso
   else
     eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mVÉRIFICATION DE(S) DÉPENDANCE(S)  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
   fi
