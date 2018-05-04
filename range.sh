@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.1" #base du système de mise à jour
+version="Version: 2.0.0.0" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -281,7 +281,7 @@ if [[ -f "$mon_script_config" ]] ; then
   source $mon_script_config
 else
     if [[ "$script_url" != "" ]] ; then
-      script_pastebin=$script_url
+      script_github=$script_url
     fi
     if [[ "$maj_force" == "" ]] ; then
       maj_force="non"
@@ -367,7 +367,7 @@ if [[ -f "$mon_script_updater" ]] ; then
 fi
 
 #### Vérification de version pour éventuelle mise à jour
-version_distante=`wget -O- -q "$script_pastebin" | grep "Version:" | awk '{ print $2 }' | sed -n 1p | awk '{print $1}' | sed -e 's/\r//g' | sed 's/"//g'`
+version_distante=`wget -O- -q "$script_github" | grep "Version:" | awk '{ print $2 }' | sed -n 1p | awk '{print $1}' | sed -e 's/\r//g' | sed 's/"//g'`
 version_locale=`echo $version | awk '{print $2}'`
  
 vercomp () {
@@ -426,7 +426,7 @@ if [[ "$compare" != "" ]] ; then
   chmod +x $mon_script_updater
   echo "#!/bin/bash" >> $mon_script_updater
   mon_script_fichier_temp=`echo $mon_script_fichier"-temp"`
-  echo "wget -q $script_pastebin -O $mon_script_fichier_temp" >> $mon_script_updater
+  echo "wget -q $script_github -O $mon_script_fichier_temp" >> $mon_script_updater
   echo "sed -i -e 's/\r//g' $mon_script_fichier_temp" >> $mon_script_updater
   if [[ "$mon_script_fichier" =~ \.sh$ ]]; then
     echo "mv $mon_script_fichier_temp $mon_script_fichier" >> $mon_script_updater
