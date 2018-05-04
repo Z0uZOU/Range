@@ -1051,7 +1051,6 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mVERIFICATION DE FILEBOT  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
-echo -e "\e[42mVERIFICATION DE FILEBOT:\e[0m"
 for dossier in $mes_dossiers_auto ; do
   source_actuelle=${!dossier}
   cible_var=`echo $dossier | sed -e 's/download/cible/g'`
