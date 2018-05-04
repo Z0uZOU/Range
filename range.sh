@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.6" #base du système de mise à jour
+version="Version: 2.0.0.7" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -915,7 +915,7 @@ if [[ -f "/usr/share/desktop-directories/scripts-scoony.directory" ]] ; then
   useless=1
 else
 ## je met l'icone en place
-  wget -q "$icone_github" -O /usr/share/icons/scripts.png
+  wget -q http://i.imgur.com/XRCxvJK.png -O /usr/share/icons/scripts.png
   if [[ "$CHECK_MUI" != "" ]]; then
     source $mon_script_langue
     echo "$mui_creating_menu_folder"
@@ -937,7 +937,7 @@ fi
 if [[ -f "/usr/local/share/applications/$mon_script_desktop" ]] ; then
   useless=1
 else
-  wget -q $icone_imgur -O /usr/share/icons/$mon_script_base.png
+  wget -q $icone_github -O /usr/share/icons/$mon_script_base.png
   if [[ -d "/usr/local/share/applications" ]]; then
     useless="1"
   else
