@@ -6,13 +6,13 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.0" #base du système de mise à jour
+version="Version: 2.0.0.1" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
 changelog_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/changelog" #emplacement du changelog de ce script
-langue_fr="https://raw.githubusercontent.com/Z0uZOU/Range/master/lang/fr.lang"
-langue_eng="https://raw.githubusercontent.com/Z0uZOU/Range/master/lang/eng.lang"
+langue_fr="https://raw.githubusercontent.com/Z0uZOU/Range/master/lang/french.lang"
+langue_eng="https://raw.githubusercontent.com/Z0uZOU/Range/master/lang/english.lang"
 icone_github="https://github.com/Z0uZOU/Range/blob/master/.cache-icons/range.png" #emplacement de l'icône du script
 required_repos="" #ajout de repository
 required_tools="" #dépendances du script
