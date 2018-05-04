@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.8" #base du système de mise à jour
+version="Version: 2.0.0.9" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1021,7 +1021,7 @@ if [[ "$java_local" == "" ]]; then
   java_update=`apt update`
   java_install=`apt install oracle-java8-installer -y`
 else
-  eval 'echo -e "[\e[42m\u2713 \e[0m] Java est installé ("$java_local")"' $mon_log_perso
+  eval 'echo -e "[\e[42m\u2713 \e[0m] La dépendance: Java est installé ("$java_local")"' $mon_log_perso
 fi
 
 #### Détection des variables (download_auto*)
@@ -1146,8 +1146,8 @@ for dossier in $mes_dossiers_auto ; do
       for h in "${media_fait[@]}"; do
         filebot_source=`echo $h | grep "MOVE" | cut -d'[' -f3 | sed 's/].*//g'`
         filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f4 | sed 's/].*//g'`
-        eval 'echo "    fichier: "$filebot_source' $mon_log_perso
-        eval 'echo "    ... renommé/déplacé: "$filebot_cible' $mon_log_perso
+        eval 'echo "     Fichier: "$filebot_source' $mon_log_perso
+        eval 'echo "     ... renommé/déplacé: "$filebot_cible' $mon_log_perso
       done
     else
       eval 'echo -e "[\e[41m\u2717 \e[0m] Aucun média détecté dans "$dossier_source' $mon_log_perso
@@ -1162,7 +1162,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOUBLONS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
-eval 'echo " ..  scan en cours"' $mon_log_perso
+eval 'echo " ..  Scan en cours"' $mon_log_perso
 find "/mnt" -path '/mnt/sd*' -type f -iname '*[avi|mp4|mkv|divx]' >mes_medias.txt &
 pid=$!
 spin='-\|/'
@@ -1190,9 +1190,9 @@ else
 fi
 if [[ "$mes_doublons" != "" ]]; then
   maj_necessaire="1"
-  eval 'echo " ..  mise à jour de la base de donnée"' $mon_log_perso
+  eval 'echo " ..  Mise à jour de la base de donnée"' $mon_log_perso
   updatedb
-  eval 'echo " ..  base de donnée mise à jour"' $mon_log_perso
+  eval 'echo " ..  Base de donnée mise à jour"' $mon_log_perso
   sed -i 's/^[ \t]*//' mes_doublons.txt
   sed -i 's/[^ ]* //' mes_doublons.txt
   sed -i '/desktop/d' mes_doublons.txt
@@ -1242,7 +1242,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOSSIERS VIDES  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
-echo " ..  scan en cours"
+echo " ..  Scan en cours"
 find "/mnt/" -depth -path '/mnt/sd*' -type d -empty | sed '/\/Plex\//!d' > dossiers_vides.txt &
 pid=$!
 spin='-\|/'
@@ -1262,7 +1262,7 @@ rm dossiers_vides.txt
 if [[ "${dossiers_vides[@]}" != "" ]]; then
   eval 'echo -e "[\e[42m\u2713 \e[0m] Des dossiers vides ont été détectés"' $mon_log_perso
   for l in "${dossiers_vides[@]}"; do
-    eval 'echo "     dossier: "$l' $mon_log_perso
+    eval 'echo "     Dossier: "$l' $mon_log_perso
     rmdir "$l"
     eval 'echo "     ... suppression effectuée"' $mon_log_perso
   done
