@@ -1044,6 +1044,66 @@ for dossier in $mes_dossiers_auto ; do
   fi
 done
 
+## Envoie à FileBot
+echo -e "\e[42mVERIFICATION DE FILEBOT:\e[0m"
+for dossier in $mes_dossiers_auto ; do
+  source_actuelle=${!dossier}
+  cible_var=`echo $dossier | sed -e 's/download/cible/g'`
+  cible_actuelle=${!cible_var}
+  if [[ "$source_actuelle" != "" ]] && [[ "$cible_actuelle" != "" ]]; then
+    if [[ "$dossier" =~ "film" ]] || [[ "$dossier" =~ "movie" ]]; then
+      dossier_source=${!dossier}
+      agent="TheMovieDB"
+      format="movieFormat"
+      output="{n} ({y})"
+    else
+      dossier_source=${!dossier}
+      agent="TheTVDB"
+      format="seriesFormat"
+      output="{n}/{'Saison '+s.pad(2)}/{n} - {sxe} - {t}"
+    fi
+    dossier_var=`echo $dossier | sed -e 's/download/cible/g'`
+    dossier_cible=${!dossier_var}
+    mes_medias=()
+    find "$dossier_source" -type f -iname '*[avi|mp4|mkv]' -print0 >tmpfile 
+    while IFS= read -r -d $'\0'; do 
+    mes_medias+=("$REPLY")
+    done <tmpfile
+    rm -f tmpfile
+    if [[ "${mes_medias[@]}" != "" ]]; then
+      echo -e "[\e[42m\u2713 \e[0m] Traitement en cours dans "$dossier_source
+      maj_necessaire="1"
+      filebot -script fn:amc --db $agent -non-strict --conflict override --lang fr --encoding UTF-8 --mode rename "$dossier_source" --def "$format=$dossier_cible/$output" > filebot.txt 2>/dev/null &
+      pid=$!
+      spin='-\|/'
+      i=0
+      while kill -0 $pid 2>/dev/null
+      do
+      i=$(( (i+1) %4 ))
+      printf "\rChargement... ${spin:$i:1}"
+      sleep .1
+      done
+      printf "\r"
+      sed -i '/MOVE/!d' filebot.txt
+      media_fait=()
+      while IFS= read -r -d $'\n'; do
+      media_fait+=("$REPLY")
+      done <filebot.txt
+      rm -f filebot.txt
+      for h in "${media_fait[@]}"; do
+        filebot_source=`echo $h | grep "MOVE" | cut -d'[' -f3 | sed 's/].*//g'`
+        filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f4 | sed 's/].*//g'`
+        echo "    fichier: "$filebot_source
+        echo "    ... renommé/déplacé: "$filebot_cible
+      done
+    else
+      echo -e "[\e[41m\u2717 \e[0m] Aucun média détecté dans "$dossier_source
+    fi
+  fi
+done
+
+
+
 
 
 fin_script=`date`
