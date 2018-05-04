@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.2" #base du système de mise à jour
+version="Version: 2.0.0.3" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1138,9 +1138,9 @@ mes_doublons=`cat mes_doublons.txt`
 nombre_doublon=`wc -l < mes_doublons.txt`
 rm mes_medias.txt
 if [[ "$mes_doublons" == "" ]]; then
-  echo -e "[\e[42m\u2705 \e[0m] Aucun doublon n'a été détecté"
+  echo -e "[\e[42m\u2713 \e[0m] Aucun doublon n'a été détecté"
 else
-  echo -e "[\e[41m  \e[0m] Des doublons ont été détectés ("$nombre_doublon")"
+  echo -e "[\e[41m\u2717 \e[0m] Des doublons ont été détectés ("$nombre_doublon")"
   #cat mes_doublons.txt
 fi
 if [[ "$mes_doublons" != "" ]]; then
@@ -1215,14 +1215,14 @@ while IFS= read -r -d $'\n'; do
 done <dossiers_vides.txt
 rm dossiers_vides.txt
 if [[ "${dossiers_vides[@]}" != "" ]]; then
-  echo -e "[\e[41m  \e[0m] Des dossiers vides ont été détectés"
+  echo -e "[\e[42m\u2713 \e[0m] Des dossiers vides ont été détectés"
   for l in "${dossiers_vides[@]}"; do
     echo "    dossier: "$l
     rmdir "$l"
     echo "    ... suppression effectuée"
   done
 else
-  echo -e "[\e[42m\u2705 \e[0m] Aucun dossier vide n'a été détecté"
+  echo -e "[\e[41m\u2717 \e[0m] Aucun dossier vide n'a été détecté"
 fi
 
 #### Mise à jour de Plex
@@ -1234,18 +1234,18 @@ else
 fi
 verification_plex=`wget -q -O- http://localhost:32400/web | grep "<title>Plex</title>"`
 if [[ "$verification_plex" != "" ]]; then
-  echo -e "[\e[42m\u2705 \e[0m] Serveur Plex en fonctionnement"
+  echo -e "[\e[42m\u2713 \e[0m] Serveur Plex en fonctionnement"
   if [[ "$maj_necessaire" == "1" ]]; then
-    echo -e "[\e[42m\u2705 \e[0m] Mise à jour de la librairie en cours"
+    echo -e "[\e[42m\u2713 \e[0m] Mise à jour de la librairie en cours"
     cd /root
     url_refresh=`echo "http://127.0.0.1:32400/library/sections/all/refresh?X-Plex-Token="$token`
     wget -q "$url_refresh"
     rm -rf refresh?X-Plex-Token=$token
   else
-    echo -e "[\e[41m  \e[0m] Aucun nouveau média, mise à jour de librairie pas nécessaire"
+    echo -e "[\e[41m\u2717 \e[0m] Aucun nouveau média, mise à jour de librairie pas nécessaire"
   fi
 else
-  echo -e "[\e[41m  \e[0m] Le serveur Plex n'est pas lancé"
+  echo -e "[\e[41m\u2717 \e[0m] Le serveur Plex n'est pas lancé"
 fi
 
 
