@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.1" #base du système de mise à jour
+version="Version: 2.0.0.2" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1108,7 +1108,12 @@ for dossier in $mes_dossiers_auto ; do
 done
 
 #### Recherche de dupe
-echo -e "\e[42mRECHERCHE DE DOUBLONS:\e[0m"
+if [[ "$CHECK_MUI" != "" ]]; then
+  source $mon_script_langue
+  eval 'printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-62s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_doublons"' $mon_log_perso
+else
+  eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOUBLONS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
+fi
 echo "... scan en cours"
 find "/mnt" -path '/mnt/sd*' -type f -iname '*[avi|mp4|mkv|divx]' >mes_medias.txt &
 pid=$!
@@ -1186,7 +1191,12 @@ if [[ "$mes_doublons" != "" ]]; then
 fi
 
 #### Suppression des dossiers vides
-echo -e "\e[42mRECHERCHE DE DOSSIERS VIDES:\e[0m"
+if [[ "$CHECK_MUI" != "" ]]; then
+  source $mon_script_langue
+  eval 'printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-62s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_dossiers_vides"' $mon_log_perso
+else
+  eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOSSIERS VIDES  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
+fi
 echo "... scan en cours"
 find "/mnt/" -depth -path '/mnt/sd*' -type d -empty | sed '/\/Plex\//!d' > dossiers_vides.txt &
 pid=$!
@@ -1216,7 +1226,12 @@ else
 fi
 
 #### Mise à jour de Plex
-echo -e "\e[42mVERIFICATION DE PLEX:\e[0m"
+if [[ "$CHECK_MUI" != "" ]]; then
+  source $mon_script_langue
+  eval 'printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-62s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_plex"' $mon_log_perso
+else
+  eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mVERIFICATION DE PLEX  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
+fi
 verification_plex=`wget -q -O- http://localhost:32400/web | grep "<title>Plex</title>"`
 if [[ "$verification_plex" != "" ]]; then
   echo -e "[\e[42m\u2705 \e[0m] Serveur Plex en fonctionnement"
