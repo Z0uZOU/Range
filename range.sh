@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.1" #base du système de mise à jour
+version="Version: 2.0.0.2" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -965,6 +965,75 @@ fi
 #### Initialisation
 maj_necessaire="0"
 
+## Vérification de Java
+java_local=`java -version 2>&1 >/dev/null | grep 'java version' | awk '{print $3}' | sed -e 's/"//g'`
+if [[ "$java_local" == "" ]]; then
+  echo -e "[\e[41m  \e[0m] Java est nécessaire... lancement de l'installation"
+  java_repo=`add-apt-repository ppa:webupd8team/java`
+  java_update=`apt update`
+  java_install=`apt install oracle-java8-installer -y`
+else
+  echo -e "[\e[42m\u2705 \e[0m] Java est installé ("$java_local")"
+fi
+
+#### Détection des variables (download_auto*)
+for i in _ {a..z} {A..Z}; do eval "echo \${!$i@}" ; done | xargs printf "%s\n" | grep download_auto > variables
+mes_dossiers_auto=`cat variables`
+rm variables
+
+#### Vérification de la configuration
+echo -e "\e[42mVERIFICATION DE LA CONFIGURATION:\e[0m"
+for verif_config in $mes_dossiers_auto ; do
+  source=${!verif_config}
+  cible_var=`echo $verif_config | sed -e 's/download/cible/g'`
+  cible=${!cible_var}
+  if [[ "$source" != "" ]]; then
+    if [[ "$cible" != "" ]]; then
+      echo -e "[\e[42m\u2705 \e[0m] $source \u2192 $cible"
+    else
+      echo -e "[\e[41m  \e[0m] Soucis de configuration"
+    fi
+  else
+    if [[ "$cible" == "" ]]; then
+      useless="1"
+    else
+      echo -e "[\e[41m  \e[0m] Soucis de configuration"
+    fi
+  fi
+done
+
+#### Chmod des dossiers source
+echo -e "\e[42mCHMOD DES DOSSIERS SOURCE:\e[0m"
+for dossier in $mes_dossiers_auto ; do
+  dossier_actuel=${!dossier}
+  if [[ "$dossier_actuel" != "" ]]; then
+    chmod 777 -R "$dossier_actuel"
+    echo -e "[\e[42m\u2705 \e[0m] Source: "$dossier_actuel
+  fi
+done
+
+#### Chmod des dossiers cible
+echo -e "\e[42mCHMOD DES DOSSIERS CIBLE:\e[0m"
+for dossier in $mes_dossiers_auto ; do
+  dossier_var=`echo $dossier | sed -e 's/download/cible/g'`
+  dossier_actuel=${!dossier_var}
+  if [[ "$dossier_actuel" != "" ]]; then
+    chmod 777 -R "$dossier_actuel"
+    echo -e "[\e[42m\u2705 \e[0m] Cible: "$dossier_actuel
+  fi
+done
+
+#### Calcul de l'espace libre dans les destinations
+echo -e "\e[42mESPACE LIBRE DANS LES DOSSIERS CIBLE:\e[0m"
+for dossier in $mes_dossiers_auto ; do
+  dossier_var=`echo $dossier | sed -e 's/download/cible/g'`
+  dossier_actuel=${!dossier_var}
+  if [[ "$dossier_actuel" != "" ]]; then
+    cible_hdd=`df "$dossier_actuel" | sed -n '2p' | awk '{print $4}'`
+    cible_hdd_go=$(($cible_hdd / 1048576))
+    echo -e "[\e[42m\u2705 \e[0m] "$dossier_actuel" : "$cible_hdd_go" Go"
+  fi
+done
 
 
 
