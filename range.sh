@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.2" #base du système de mise à jour
+version="Version: 2.0.0.0" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1012,7 +1012,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
   source $mon_script_langue
   eval 'printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-62s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_chmod"' $mon_log_perso
 else
-  eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mCHMOD DES DOSSIERS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
+  eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mCHMOD ET CONTROLE DES DOSSIERS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
 for dossier in $mes_dossiers_auto ; do
   dossier_actuel=${!dossier}
@@ -1033,32 +1033,13 @@ for dossier in $mes_dossiers_auto ; do
   if [[ "$dossier_actuel" != "" ]]; then
     if [[ -d "$dossier_actuel" ]]; then
       chmod 777 -R "$dossier_actuel"
-      echo -e "[\e[42m\u2713 \e[0m] Cible: "$dossier_actuel
+      cible_hdd=`df -Hl "$dossier_actuel" | grep '/dev/' | awk '{print $4}' | sed 's/M/ Mo/' | sed 's/T/ To/' | sed 's/G/ Go/'`
+      echo -e "[\e[42m\u2713 \e[0m] Cible: "$dossier_actuel "("$cible_hdd")"
     else
       mkdir -p "$dossier_actuel"
       chmod 777 -R "$dossier_actuel"
-      echo -e "[\e[41m\u2717 \e[0m] Cible: "$dossier_actuel" (Création du dossier)"
-    fi
-  fi
-done
-
-#### Calcul de l'espace libre dans les destinations
-if [[ "$CHECK_MUI" != "" ]]; then
-  source $mon_script_langue
-  eval 'printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-62s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_espace_libre"' $mon_log_perso
-else
-  eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mESPACE LIBRE DANS LES DOSSIERS CIBLE  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
-fi
-for dossier in $mes_dossiers_auto ; do
-  dossier_var=`echo $dossier | sed -e 's/download/cible/g'`
-  dossier_actuel=${!dossier_var}
-  if [[ "$dossier_actuel" != "" ]]; then
-    if [[ -d "$dossier_actuel" ]]; then
-      cible_hdd=`df "$dossier_actuel" | sed -n '2p' | awk '{print $4}'`
-      cible_hdd_go=$(($cible_hdd / 1048576))
-      echo -e "[\e[42m\u2713 \e[0m] "$dossier_actuel" : "$cible_hdd_go" Go"
-    else
-      echo -e "[\e[41m\u2717 \e[0m] "$dossier_actuel" : \u2717"
+      cible_hdd=`df -Hl "$dossier_actuel" | grep '/dev/' | awk '{print $4}' | sed 's/M/ Mo/' | sed 's/T/ To/' | sed 's/G/ Go/'`
+      echo -e "[\e[41m\u2717 \e[0m] Cible: "$dossier_actuel" ("$cible_hdd")  (Création du dossier)"
     fi
   fi
 done
