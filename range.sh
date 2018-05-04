@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.3" #base du système de mise à jour
+version="Version: 2.0.0.4" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1114,7 +1114,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOUBLONS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
-echo "... scan en cours"
+echo " ...  scan en cours"
 find "/mnt" -path '/mnt/sd*' -type f -iname '*[avi|mp4|mkv|divx]' >mes_medias.txt &
 pid=$!
 spin='-\|/'
@@ -1145,7 +1145,7 @@ else
 fi
 if [[ "$mes_doublons" != "" ]]; then
   maj_necessaire="1"
-  echo "... mise à jour de la base de donnée"
+  echo " ...  mise à jour de la base de donnée"
   updatedb
   echo "... base de donnée mise à jour"
   sed -i 's/^[ \t]*//' mes_doublons.txt
@@ -1156,7 +1156,7 @@ if [[ "$mes_doublons" != "" ]]; then
   mes_medias+=("$REPLY")
   done <mes_doublons.txt
   rm -f mes_doublons.txt
-  echo "... traitement des doublons"
+  echo " ...  traitement des doublons"
   for i in "${mes_medias[@]}"; do
     echo -e "[\e[41m  \e[0m] Média trouvé: "$i
     locate -ir "$i" > mon_doublon.txt
@@ -1197,7 +1197,7 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOSSIERS VIDES  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
-echo "... scan en cours"
+echo " ...  scan en cours"
 find "/mnt/" -depth -path '/mnt/sd*' -type d -empty | sed '/\/Plex\//!d' > dossiers_vides.txt &
 pid=$!
 spin='-\|/'
