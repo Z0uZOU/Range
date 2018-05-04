@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.0" #base du système de mise à jour
+version="Version: 2.0.0.1" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1107,6 +1107,131 @@ for dossier in $mes_dossiers_auto ; do
   fi
 done
 
+#### Recherche de dupe
+echo -e "\e[42mRECHERCHE DE DOUBLONS:\e[0m"
+echo "... scan en cours"
+find "/mnt" -path '/mnt/sd*' -type f -iname '*[avi|mp4|mkv|divx]' >mes_medias.txt &
+pid=$!
+spin='-\|/'
+i=0
+while kill -0 $pid 2>/dev/null
+do
+  i=$(( (i+1) %4 ))
+  printf "\rChargement... ${spin:$i:1}"
+  sleep .1
+done
+printf "\r"
+sed -i '/\.srt/d' mes_medias.txt
+sed -i 's/\.[^.]*$//' mes_medias.txt
+sed -i '/\/Plex\//!d' mes_medias.txt
+#sed -i '/\/mnt\//d' mes_medias.txt
+sed -i '/desktop/d' mes_medias.txt
+#perl -pe 's/\..*$//;s{^.*/}{}' mes_medias.txt > medias.txt
+sed -i 's/.*\///' mes_medias.txt
+sort mes_medias.txt | uniq -cd > mes_doublons.txt
+mes_doublons=`cat mes_doublons.txt`
+nombre_doublon=`wc -l < mes_doublons.txt`
+rm mes_medias.txt
+if [[ "$mes_doublons" == "" ]]; then
+  echo -e "[\e[42m\u2705 \e[0m] Aucun doublon n'a été détecté"
+else
+  echo -e "[\e[41m  \e[0m] Des doublons ont été détectés ("$nombre_doublon")"
+  #cat mes_doublons.txt
+fi
+if [[ "$mes_doublons" != "" ]]; then
+  maj_necessaire="1"
+  echo "... mise à jour de la base de donnée"
+  updatedb
+  echo "... base de donnée mise à jour"
+  sed -i 's/^[ \t]*//' mes_doublons.txt
+  sed -i 's/[^ ]* //' mes_doublons.txt
+  sed -i '/desktop/d' mes_doublons.txt
+  mes_medias=()
+  while IFS= read -r -d $'\n'; do
+  mes_medias+=("$REPLY")
+  done <mes_doublons.txt
+  rm -f mes_doublons.txt
+  echo "... traitement des doublons"
+  for i in "${mes_medias[@]}"; do
+    echo -e "[\e[41m  \e[0m] Média trouvé: "$i
+    locate -ir "$i" > mon_doublon.txt
+    sed -i '/\.srt/d' mon_doublon.txt
+    sed -i '/\/Plex\//!d' mon_doublon.txt
+    mon_media=()
+    while IFS= read -r -d $'\n'; do
+    mon_media+=("$REPLY")
+    done <mon_doublon.txt
+    for j in "${mon_media[@]}"; do
+      echo "    ... chemin: "$j
+    done
+    while read -r line; do
+    stat -c '%Y %n' "$line"
+    done < mon_doublon.txt | sort -n -r | sed -n '1p' | sed 's/[^ ]* //' > bon.txt
+    plus_recent=`cat bon.txt`
+    echo "    ... le plus récent: "$plus_recent
+    grep -v "$plus_recent" mon_doublon.txt > a_supprimer.txt
+    a_supprimer=()
+    while IFS= read -r -d $'\n'; do
+    a_supprimer+=("$REPLY")
+    done <a_supprimer.txt
+    for k in "${a_supprimer[@]}"; do
+      echo "    ... suppression de: "$k
+      rm -f "$k"
+    done
+    rm -f /opt/scripts/mes_doublons.txt
+    rm -f mon_doublon.txt
+    rm -f bon.txt
+    rm -f a_supprimer.txt
+  done
+fi
+
+#### Suppression des dossiers vides
+echo -e "\e[42mRECHERCHE DE DOSSIERS VIDES:\e[0m"
+echo "... scan en cours"
+find "/mnt/" -depth -path '/mnt/sd*' -type d -empty | sed '/\/Plex\//!d' > dossiers_vides.txt &
+pid=$!
+spin='-\|/'
+i=0
+while kill -0 $pid 2>/dev/null
+do
+  i=$(( (i+1) %4 ))
+  printf "\rChargement... ${spin:$i:1}"
+  sleep .1
+done
+printf "\r"
+dossiers_vides=()
+while IFS= read -r -d $'\n'; do
+  dossiers_vides+=("$REPLY")
+done <dossiers_vides.txt
+rm dossiers_vides.txt
+if [[ "${dossiers_vides[@]}" != "" ]]; then
+  echo -e "[\e[41m  \e[0m] Des dossiers vides ont été détectés"
+  for l in "${dossiers_vides[@]}"; do
+    echo "    dossier: "$l
+    rmdir "$l"
+    echo "    ... suppression effectuée"
+  done
+else
+  echo -e "[\e[42m\u2705 \e[0m] Aucun dossier vide n'a été détecté"
+fi
+
+#### Mise à jour de Plex
+echo -e "\e[42mVERIFICATION DE PLEX:\e[0m"
+verification_plex=`wget -q -O- http://localhost:32400/web | grep "<title>Plex</title>"`
+if [[ "$verification_plex" != "" ]]; then
+  echo -e "[\e[42m\u2705 \e[0m] Serveur Plex en fonctionnement"
+  if [[ "$maj_necessaire" == "1" ]]; then
+    echo -e "[\e[42m\u2705 \e[0m] Mise à jour de la librairie en cours"
+    cd /root
+    url_refresh=`echo "http://127.0.0.1:32400/library/sections/all/refresh?X-Plex-Token="$token`
+    wget -q "$url_refresh"
+    rm -rf refresh?X-Plex-Token=$token
+  else
+    echo -e "[\e[41m  \e[0m] Aucun nouveau média, mise à jour de librairie pas nécessaire"
+  fi
+else
+  echo -e "[\e[41m  \e[0m] Le serveur Plex n'est pas lancé"
+fi
 
 
 
