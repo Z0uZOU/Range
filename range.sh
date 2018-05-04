@@ -1018,7 +1018,7 @@ for dossier in $mes_dossiers_auto ; do
   dossier_actuel=${!dossier}
   if [[ "$dossier_actuel" != "" ]]; then
     chmod 777 -R "$dossier_actuel"
-    echo -e "[\e[42m\u2705 \e[0m] Source: "$dossier_actuel
+    echo -e "[\e[42m\u2713 \e[0m] Source: "$dossier_actuel
   fi
 done
 
@@ -1028,7 +1028,7 @@ for dossier in $mes_dossiers_auto ; do
   dossier_actuel=${!dossier_var}
   if [[ "$dossier_actuel" != "" ]]; then
     chmod 777 -R "$dossier_actuel"
-    echo -e "[\e[42m\u2705 \e[0m] Cible: "$dossier_actuel
+    echo -e "[\e[42m\u2713 \e[0m] Cible: "$dossier_actuel
   fi
 done
 
@@ -1045,7 +1045,7 @@ for dossier in $mes_dossiers_auto ; do
   if [[ "$dossier_actuel" != "" ]]; then
     cible_hdd=`df "$dossier_actuel" | sed -n '2p' | awk '{print $4}'`
     cible_hdd_go=$(($cible_hdd / 1048576))
-    echo -e "[\e[42m\u2705 \e[0m] "$dossier_actuel" : "$cible_hdd_go" Go"
+    echo -e "[\e[42m\u2713 \e[0m] "$dossier_actuel" : "$cible_hdd_go" Go"
   fi
 done
 
