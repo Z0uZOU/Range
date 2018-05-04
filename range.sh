@@ -3,12 +3,13 @@
 ########################
 ## Script de Scoony
 ########################
-## Installation: wget -q https://pastebin.com/raw/cz5Hm09d -O selfcheck2.sh && sed -i -e 's/\r//g' selfcheck2.sh && shc -f selfcheck2.sh -o selfcheck2.bin && chmod +x selfcheck2.bin && rm -f *.x.c && rm -f selfcheck2.sh
+## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
+## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
 version="Version: 1.0.1.26" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
-script_pastebin="https://pastebin.com/raw/6Kp8MFJ7" #emplacement du script original
-icone_pastebin="http://i.imgur.com/JKZ5lDh.png" #emplacement de l'icône du script
+script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
+icone_pastebin="https://github.com/Z0uZOU/Range/blob/master/.cache-icons/range.png" #emplacement de l'icône du script
 required_repos="" #ajout de repository
 required_tools="" #dépendances du script
 required_tools_pip="" #dépendances du script (PIP)
