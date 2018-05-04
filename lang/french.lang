@@ -82,4 +82,4 @@ K_unit="Ko"
 ## Spécifique à ce script
 mui_section_configuration="VERIFICATION DE LA CONFIGURATION"
 mui_section_chmod="CHMOD ET CONTROLE DES DOSSIERS"
-mui_section_espace_libre="ESPACE LIBRE DANS LES DOSSIERS CIBLE"
+mui_section_filebot="VERIFICATION DE FILEBOT"
