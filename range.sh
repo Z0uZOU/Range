@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.9" #base du système de mise à jour
+version="Version: 2.0.0.10" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1256,7 +1256,10 @@ done
 printf "\r"
 dossiers_vides=()
 while IFS= read -r -d $'\n'; do
-  dossiers_vides+=("$REPLY")
+  dossier_a_supprimer=`echo $REPLY | sed 's/\(.*\)\/.*/\1/' | grep '/Plex/'`
+  if [[ "$dossier_a_supprimer" != "" ]]; then
+    dossiers_vides+=("$REPLY")
+  fi
 done <dossiers_vides.txt
 rm dossiers_vides.txt
 if [[ "${dossiers_vides[@]}" != "" ]]; then
