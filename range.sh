@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.10" #base du système de mise à jour
+version="Version: 2.0.0.11" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1263,14 +1263,14 @@ while IFS= read -r -d $'\n'; do
 done <dossiers_vides.txt
 rm dossiers_vides.txt
 if [[ "${dossiers_vides[@]}" != "" ]]; then
-  eval 'echo -e "[\e[42m\u2713 \e[0m] Des dossiers vides ont été détectés"' $mon_log_perso
+  eval 'echo -e "[\e[41m\u2717 \e[0m] Des dossiers vides ont été détectés"' $mon_log_perso
   for l in "${dossiers_vides[@]}"; do
     eval 'echo "     Dossier: "$l' $mon_log_perso
     rmdir "$l"
     eval 'echo "     ... suppression effectuée"' $mon_log_perso
   done
 else
-  eval 'echo -e "[\e[41m\u2717 \e[0m] Aucun dossier vide détecté"' $mon_log_perso
+  eval 'echo -e "[\e[42m\u2713 \e[0m] Aucun dossier vide détecté"' $mon_log_perso
 fi
 
 #### Mise à jour de Plex
@@ -1296,7 +1296,47 @@ else
   eval 'echo -e "[\e[41m\u2717 \e[0m] Serveur Plex pas lancé"' $mon_log_perso
 fi
 
-
+#### Recherche de dossiers log vides
+if [[ "$maj_necessaire" == "0" ]] ; then
+  if [[ "$CHECK_MUI" != "" ]]; then
+    source $mon_script_langue
+    printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-62s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_dossiers_log_vides"
+  else
+    echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOSSIERS LOG VIDES  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"
+  fi
+  rm -f "$fichier_log_perso"
+  dossier_log=`echo $dossier_config"/log"`
+  find $dossier_log -depth -type d -empty -not -path "$dossier_log" > $dossier_config/dossiers_vides.txt &
+  pid=$!
+  spin='-\|/'
+  i=0
+  while kill -0 $pid 2>/dev/null
+  do
+    i=$(( (i+1) %4 ))
+    printf "\rRecherche de dossier(s) log vide(s)... ${spin:$i:1}"
+    sleep .1
+  done
+  printf "$mon_printf" && printf "\r"
+  dossiers_vides=()
+  while IFS= read -r -d $'\n'; do
+    dossiers_vides+=("$REPLY")
+  done <$dossier_config/dossiers_vides.txt
+  rm -f $dossier_config/dossiers_vides.txt
+  if [[ "${dossiers_vides[@]}" != "" ]]; then
+    echo -e "[\e[41m\u2717 \e[0m] Des dossiers log vides ont été détectés"
+    for l in "${dossiers_vides[@]}"; do
+      test_source=`echo $l | grep -o $dossier_log`
+      if [[ "$test_source" != "" ]] ; then
+        if [[ -d "$l" ]]; then
+          echo -e "     ... suppression de : "$l
+          rmdir "$l"
+        fi
+      fi
+    done
+  else
+    echo -e "[\e[42m\u2713 \e[0m] Aucun dossier log vide détecté"
+  fi
+fi
 
 
 fin_script=`date`
@@ -1315,9 +1355,17 @@ if [[ "$CHECK_MUI" != "" ]]; then
       before=`eval printf "%0.s-" {1..$before_after_count}`
       after=`eval printf "%0.s-" {1..$before_after_count}`
   fi
-  eval 'printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_end_of_script" "$after"' $mon_log_perso
+  if [[ -f "$fichier_log_perso" ]]; then
+    eval 'printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_end_of_script" "$after"' $mon_log_perso
+  else
+    printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_end_of_script" "$after"
+  fi
 else
-  eval 'echo -e "\e[43m -- FIN DE SCRIPT: $fin_script -- \e[0m "' $mon_log_perso
+  if [[ -f "$fichier_log_perso" ]]; then
+    eval 'echo -e "\e[43m -- FIN DE SCRIPT: $fin_script -- \e[0m "' $mon_log_perso
+  else
+    echo -e "\e[43m -- FIN DE SCRIPT: $fin_script -- \e[0m "
+  fi
 fi
 rm "$pid_script"
 
