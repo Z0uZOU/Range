@@ -16,5 +16,5 @@
 
 ## **Remerciements :**
 
-Notre script se base sur un outils développés par la communauté:
+Notre script se base sur un outils développé par la communauté:
 - FileBot
