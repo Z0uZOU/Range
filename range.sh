@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.11" #base du système de mise à jour
+version="Version: 2.0.0.12" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -135,27 +135,24 @@ for process_travail in $verification_process ; do
 done
 
 #### Tests des arguments
-if [[ "$@" == "--version" ]]; then
+if [[ "$1" == "--version" ]]; then
   echo "$version"
   exit 1
 fi
-if [[ "$@" == "--debug" ]]; then
+if [[ "$1" == "--debug" ]] || [[ "$2" == "--debug" ]]; then
   debug="yes"
 fi
-if [[ "$@" == "--edit-config" ]]; then
+if [[ "$1" == "--edit-config" ]]; then
   nano $mon_script_config
   exit 1
 fi
-if [[ "$@" == "--debug" ]]; then
-  debug="yes"
-fi
-if [[ "$@" == "--efface-lock" ]]; then
+if [[ "$1" == "--efface-lock" ]]; then
   mon_lock=`echo "/root/.config/"$mon_script_base"/lock-"$mon_script_base`
   rm -f "$mon_lock"
   echo "Fichier lock effacé"
   exit 1
 fi
-if [[ "$@" == "--statut-lock" ]]; then
+if [[ "$1" == "--statut-lock" ]]; then
   statut_lock=`cat $mon_script_config | grep "maj_force=\"oui\""`
   if [[ "$statut_lock" == "" ]]; then
     echo "Système de lock activé"
@@ -164,17 +161,17 @@ if [[ "$@" == "--statut-lock" ]]; then
   fi
   exit 1
 fi
-if [[ "$@" == "--active-lock" ]]; then
+if [[ "$1" == "--active-lock" ]]; then
   sed -i 's/maj_force="oui"/maj_force="non"/g' $mon_script_config
   echo "Système de lock activé"
   exit 1
 fi
-if [[ "$@" == "--desactive-lock" ]]; then
+if [[ "$1" == "--desactive-lock" ]]; then
   sed -i 's/maj_force="non"/maj_force="oui"/g' $mon_script_config
   echo "Système de lock désactivé"
   exit 1
 fi
-if [[ "$@" == "--extra-log" ]]; then
+if [[ "$1" == "--extra-log" ]] || [[ "$2" == "--extra-log" ]]; then
   date_log=`date +%Y%m%d`
   heure_log=`date +%H%M`
   path_log=`echo "/root/.config/"$mon_script_base"/log/"$date_log`
@@ -182,11 +179,11 @@ if [[ "$@" == "--extra-log" ]]; then
   fichier_log_perso=`echo $path_log"/"$heure_log".log"`
   mon_log_perso="| tee -a $fichier_log_perso"
 fi
-if [[ "$@" == "--purge-process" ]]; then
+if [[ "$1" == "--purge-process" ]]; then
   ps aux | grep $mon_script_base | awk '{print $2}' | xargs kill -9
   echo "Les processus de ce script ont été tués"
 fi
-if [[ "$@" == "--purge-log" ]]; then
+if [[ "$1" == "--purge-log" ]]; then
   path_global_log=`echo "/root/.config/"$mon_script_base"/log"`
   cd $path_global_log
   mon_chemin=`echo $PWD`
@@ -202,12 +199,12 @@ if [[ "$@" == "--purge-log" ]]; then
   fi
   exit 1
 fi
-if [[ "$@" == "--changelog" ]]; then
-  wget -q -O- $changelog_github
+if [[ "$1" == "--changelog" ]]; then
+  wget -q -O- $changelog_pastebin
   echo ""
   exit 1
 fi
-if [[ "$@" == --message=* ]]; then
+if [[ "$1" == --message=* ]]; then
   source $mon_script_config
   message=`echo "$1" | sed 's/--message=//g'`
   curl -s \
@@ -220,7 +217,7 @@ if [[ "$@" == --message=* ]]; then
     https://api.pushover.net/1/messages.json > /dev/null
   exit 1
 fi
-if [[ "$@" == "--help" ]]; then
+if [[ "$1" == "--help" ]]; then
   if [[ "$CHECK_MUI" != "" ]]; then
     i=""
     for i in _ {a..z} {A..Z}; do eval "echo \${!$i@}" ; done | xargs printf "%s\n" | grep mui_menu_help > variables
@@ -231,6 +228,7 @@ if [[ "$@" == "--help" ]]; then
     path_log=`echo "/root/.config/"$mon_script_base"/log/"$date_log`
     for j in $(seq 1 $help_lignes); do
       source $mon_script_langue
+      mui_menu_help_display=`echo -e "$mui_menu_help$j"`
       echo -e "${!mui_menu_help_display}"
     done
     exit 1
@@ -269,7 +267,7 @@ if [[ "$@" == "--help" ]]; then
     exit 1
   fi
 fi
-
+ 
 #### je dois charger le fichier conf ici ou trouver une solution (script_url et maj_force)
 dossier_config=`echo "/root/.config/"$mon_script_base`
 if [[ -d "$dossier_config" ]]; then
