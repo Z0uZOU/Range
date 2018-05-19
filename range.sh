@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.12" #base du système de mise à jour
+version="Version: 2.0.0.13" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1142,8 +1142,17 @@ for dossier in $mes_dossiers_auto ; do
       done <filebot.txt
       rm -f filebot.txt
       for h in "${media_fait[@]}"; do
-        filebot_source=`echo $h | grep "MOVE" | cut -d'[' -f3 | sed 's/].*//g'`
-        filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f4 | sed 's/].*//g'`
+        filebot_source=`echo $h | grep "MOVE" | cut -d'[' -f3- | sed 's/] to .*//g'`
+        nombre_crochet=`echo $h | grep -o "\[" | wc -m`
+        if [[ "$nombre_crochet" == "6" ]]; then
+          filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f4 | sed 's/].*//g'`
+        fi
+        if [[ "$nombre_crochet" == "8" ]]; then
+          filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f5 | sed 's/].*//g'`
+        fi
+        if [[ "$nombre_crochet" == "10" ]]; then
+          filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f6 | sed 's/].*//g'`
+        fi
         eval 'echo "     Fichier: "$filebot_source' $mon_log_perso
         eval 'echo "     ... renommé/déplacé: "$filebot_cible' $mon_log_perso
       done
@@ -1161,7 +1170,7 @@ else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mRECHERCHE DE DOUBLONS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
 eval 'echo " ..  Scan en cours"' $mon_log_perso
-find "/mnt" -path '/mnt/sd*' -type f -iname '*[avi|mp4|mkv|divx]' >mes_medias.txt &
+find "/mnt" -path '/mnt/sd*' -type f -iname '*[avi|mp4|mkv|divx]' > mes_medias.txt &
 pid=$!
 spin='-\|/'
 i=0
