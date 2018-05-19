@@ -200,7 +200,7 @@ if [[ "$1" == "--purge-log" ]]; then
   exit 1
 fi
 if [[ "$1" == "--changelog" ]]; then
-  wget -q -O- $changelog_pastebin
+  wget -q -O- $changelog_github
   echo ""
   exit 1
 fi
