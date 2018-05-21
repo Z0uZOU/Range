@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.13" #base du système de mise à jour
+version="Version: 2.0.0.14" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1183,6 +1183,7 @@ done
 printf "\r"
 sed -i '/\.srt/d' mes_medias.txt
 sed -i 's/\.[^.]*$//' mes_medias.txt
+sed -i '/\/mnt\/Plex\//d' mes_medias.txt
 sed -i '/\/Plex\//!d' mes_medias.txt
 sed -i '/desktop/d' mes_medias.txt
 sed -i 's/.*\///' mes_medias.txt
@@ -1213,6 +1214,7 @@ if [[ "$mes_doublons" != "" ]]; then
     eval 'echo -e "[\e[41m  \e[0m] Média trouvé: "$i' $mon_log_perso
     locate -ir "$i" > mon_doublon.txt
     sed -i '/\.srt/d' mon_doublon.txt
+    sed -i '/\/mnt\/Plex\//d' mon_doublon.txt
     sed -i '/\/Plex\//!d' mon_doublon.txt
     mon_media=()
     while IFS= read -r -d $'\n'; do
