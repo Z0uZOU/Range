@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.14" #base du système de mise à jour
+version="Version: 2.0.0.15" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -318,13 +318,13 @@ if [[ "$maj_force" == "non" ]] ; then
     fi
     ## petite notif pour scoony
     curl -s \
-    --form-string "token=a6SLRQFfaUTgdo28wgZb6tVd1vgizs" \
-    --form-string "user=use32hsG26Ti2jkmSpX7YteA12DkQr" \
-    --form-string "title=$mon_script_base_maj HS" \
-    --form-string "message=$message_alerte" \
-    --form-string "html=1" \
-    --form-string "priority=1" \
-    https://api.pushover.net/1/messages.json > /dev/null
+      --form-string "token=$token_app" \
+      --form-string "user=$destinataire_1" \
+      --form-string "title=$mon_script_base_maj HS" \
+      --form-string "message=$message_alerte" \
+      --form-string "html=1" \
+      --form-string "priority=1" \
+      https://api.pushover.net/1/messages.json > /dev/null
     exit 1
   fi
 fi
