@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.15" #base du système de mise à jour
+version="Version: 2.0.0.16" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -105,7 +105,26 @@ push-message() {
     fi
   done
 }
-
+ 
+#### Fonction: dehumanize
+dehumanise() {
+  for v in "$@"
+  do  
+    echo $v | awk \
+      'BEGIN{IGNORECASE = 1}
+       function printpower(n,b,p) {printf "%u\n", n*b^p; next}
+       /[0-9]$/{print $1;next};
+       /K(iB|o)?$/{printpower($1,  2, 10)};
+       /M(iB|o)?$/{printpower($1,  2, 20)};
+       /G(iB|o)?$/{printpower($1,  2, 30)};
+       /T(iB|o)?$/{printpower($1,  2, 40)};
+       /KB$/{    printpower($1, 10,  3)};
+       /MB$/{    printpower($1, 10,  6)};
+       /GB$/{    printpower($1, 10,  9)};
+       /TB$/{    printpower($1, 10, 12)}'
+  done
+}
+ 
 #### Vérification de process pour éviter les doublons (commandes externes)
 for process_travail in $verification_process ; do
   process_important=`ps aux | grep $process_travail | sed '/grep/d'`
@@ -691,6 +710,8 @@ cible_auto_animation_hdtv=""
 cible_auto_animation_dvdrip=""
 cible_auto_series_vostfr=""
  
+quota_minimum="100Go"
+ 
 #### Token de Plex
 token=""
  
@@ -743,6 +764,8 @@ cible_auto_series_dvdrip=""
 cible_auto_animation_hdtv=""
 cible_auto_animation_dvdrip=""
 cible_auto_series_vostfr=""
+ 
+minimum_quota="100GiB"
  
 #### Plex's Token
 token=""
@@ -965,63 +988,65 @@ fi
 #### Initialisation
 maj_necessaire="0"
 
+if [[ "$display_dependencies" == "yes" ]] || [[ "$affiche_dependances" == "oui" ]]; then
 #### Vérification de FileBot
-wget -O- -q $lien_filebot > $dossier_config/filebot.txt &
-pid=$!
-spin='-\|/'
-i=0
-while kill -0 $pid 2>/dev/null
-do
-  i=$(( (i+1) %4 ))
-  printf "\rVérification de la dernière version de FileBot... ${spin:$i:1}"
-  sleep .1
-done
-printf "$mon_printf" && printf "\r"
-filebot_distant=`cat $dossier_config/filebot.txt | grep "filebot_" | sed -n '1p' | sed 's/.*filebot_//' | sed 's/_amd64.deb<\/a><\/span>.*//'`
-filebot_local=`filebot -version | awk '{print $2}' 2>/dev/null`
-if [[ "$filebot_local" != "$filebot_distant" ]]; then
-  useless="1"
-  filebot_lien_download=`cat $dossier_config/filebot.txt | grep "filebot_$filebot_distant" | sed -n '1p' | sed 's/.*href=\"\///' | sed 's/\">.*//'`
-  wget -q -O filebot.deb "https://github.com/$filebot_lien_download" &
+  wget -O- -q $lien_filebot > $dossier_config/filebot.txt &
   pid=$!
   spin='-\|/'
   i=0
   while kill -0 $pid 2>/dev/null
   do
     i=$(( (i+1) %4 ))
-    printf "\rTéléchargement de la dernière version de FileBot... ${spin:$i:1}"
+    printf "\rVérification de la dernière version de FileBot... ${spin:$i:1}"
     sleep .1
   done
   printf "$mon_printf" && printf "\r"
-  dpkg -i filebot.deb >/dev/null 2>&1 &
-  pid=$!
-  spin='-\|/'
-  i=0
-  while kill -0 $pid 2>/dev/null
-  do
-    i=$(( (i+1) %4 ))
-    printf "\rInstallation de la dernière version de FileBot... ${spin:$i:1}"
-    sleep .1
-  done
-  printf "$mon_printf" && printf "\r"
-  rm -f filebot.deb
-  eval 'echo -e "[\e[42m\u2713 \e[0m] FileBot est installé (version "$filebot_distant")"' $mon_log_perso
-else
-  eval 'echo -e "[\e[42m\u2713 \e[0m] La dépendance: filebot est installée ("$filebot_local")"' $mon_log_perso
-fi
-rm -f $dossier_config/filebot.txt
-
+  filebot_distant=`cat $dossier_config/filebot.txt | grep "filebot_" | sed -n '1p' | sed 's/.*filebot_//' | sed 's/_amd64.deb<\/a><\/span>.*//'`
+  filebot_local=`filebot -version | awk '{print $2}' 2>/dev/null`
+  if [[ "$filebot_local" != "$filebot_distant" ]]; then
+    useless="1"
+    filebot_lien_download=`cat $dossier_config/filebot.txt | grep "filebot_$filebot_distant" | sed -n '1p' | sed 's/.*href=\"\///' | sed 's/\">.*//' | sed 's/\/blob\//\/raw\//'`
+    wget -q -O filebot.deb "https://github.com/$filebot_lien_download" &
+    pid=$!
+    spin='-\|/'
+    i=0
+    while kill -0 $pid 2>/dev/null
+    do
+      i=$(( (i+1) %4 ))
+      printf "\rTéléchargement de la dernière version de FileBot... ${spin:$i:1}"
+       sleep .1
+    done
+    printf "$mon_printf" && printf "\r"
+    dpkg -i filebot.deb >/dev/null 2>&1 &
+    pid=$!
+    spin='-\|/'
+    i=0
+    while kill -0 $pid 2>/dev/null
+    do
+      i=$(( (i+1) %4 ))
+      printf "\rInstallation de la dernière version de FileBot... ${spin:$i:1}"
+      sleep .1
+    done
+    printf "$mon_printf" && printf "\r"
+    rm -f filebot.deb
+    eval 'echo -e "[\e[42m\u2713 \e[0m] FileBot est installé (version "$filebot_distant")"' $mon_log_perso
+  else
+    eval 'echo -e "[\e[42m\u2713 \e[0m] La dépendance: filebot est installée ("$filebot_local")"' $mon_log_perso
+  fi
+  rm -f $dossier_config/filebot.txt
+ 
 ## Vérification de Java
-java_local=`java -version 2>&1 >/dev/null | grep 'java version' | awk '{print $3}' | sed -e 's/"//g'`
-if [[ "$java_local" == "" ]]; then
-  eval 'echo -e "[\e[41m\u2717 \e[0m] Java est nécessaire... installation lancée"' $mon_log_perso
-  java_repo=`add-apt-repository ppa:webupd8team/java`
-  java_update=`apt update`
-  java_install=`apt install oracle-java8-installer -y`
-else
-  eval 'echo -e "[\e[42m\u2713 \e[0m] La dépendance: Java est installé ("$java_local")"' $mon_log_perso
+  java_local=`java -version 2>&1 >/dev/null | grep 'java version' | awk '{print $3}' | sed -e 's/"//g'`
+  if [[ "$java_local" == "" ]]; then
+    eval 'echo -e "[\e[41m\u2717 \e[0m] Java est nécessaire... installation lancée"' $mon_log_perso
+    java_repo=`add-apt-repository ppa:webupd8team/java`
+    java_update=`apt update`
+    java_install=`apt install oracle-java8-installer -y`
+  else
+    eval 'echo -e "[\e[42m\u2713 \e[0m] La dépendance: Java est installé ("$java_local")"' $mon_log_perso
+  fi
 fi
-
+ 
 #### Détection des variables (download_auto*)
 for i in _ {a..z} {A..Z}; do eval "echo \${!$i@}" ; done | xargs printf "%s\n" | grep download_auto > variables
 mes_dossiers_auto=`cat variables`
@@ -1097,6 +1122,12 @@ if [[ "$CHECK_MUI" != "" ]]; then
 else
   eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mVERIFICATION DE FILEBOT  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
 fi
+if [[ "$quota_minimum" != "" ]]; then
+  eval 'echo " ..  Quota minimum configuré: "$quota_minimum' $mon_log_perso
+else
+  eval 'echo " ..  Pas de quota minimum configuré"' $mon_log_perso
+  quota_minimum="0"
+fi
 for dossier in $mes_dossiers_auto ; do
   source_actuelle=${!dossier}
   cible_var=`echo $dossier | sed -e 's/download/cible/g'`
@@ -1122,40 +1153,47 @@ for dossier in $mes_dossiers_auto ; do
     done <tmpfile
     rm -f tmpfile
     if [[ "${mes_medias[@]}" != "" ]]; then
-      eval 'echo -e "[\e[42m\u2713 \e[0m] Traitement en cours dans "$dossier_source' $mon_log_perso
-      maj_necessaire="1"
-      filebot -script fn:amc --db $agent -non-strict --conflict override --lang fr --encoding UTF-8 --mode rename "$dossier_source" --def "$format=$dossier_cible/$output" > filebot.txt 2>/dev/null &
-      pid=$!
-      spin='-\|/'
-      i=0
-      while kill -0 $pid 2>/dev/null
-      do
-      i=$(( (i+1) %4 ))
-      printf "\rChargement... ${spin:$i:1}"
-      sleep .1
-      done
-      printf "\r"
-      sed -i '/MOVE/!d' filebot.txt
-      media_fait=()
-      while IFS= read -r -d $'\n'; do
-      media_fait+=("$REPLY")
-      done <filebot.txt
-      rm -f filebot.txt
-      for h in "${media_fait[@]}"; do
-        filebot_source=`echo $h | grep "MOVE" | cut -d'[' -f3- | sed 's/] to .*//g'`
-        nombre_crochet=`echo $h | grep -o "\[" | wc -m`
-        if [[ "$nombre_crochet" == "6" ]]; then
-          filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f4 | sed 's/].*//g'`
-        fi
-        if [[ "$nombre_crochet" == "8" ]]; then
-          filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f5 | sed 's/].*//g'`
-        fi
-        if [[ "$nombre_crochet" == "10" ]]; then
-          filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f6 | sed 's/].*//g'`
-        fi
-        eval 'echo "     Fichier: "$filebot_source' $mon_log_perso
-        eval 'echo "     ... renommé/déplacé: "$filebot_cible' $mon_log_perso
-      done
+      dossier_source_taille=`df -Hl "$dossier_source" | grep '/dev/' | awk '{print $4}'`
+      dossier_source_dehumanise=`dehumanise $dossier_source_taille`
+      quota_minimum_dehumanise=`dehumanise $quota_minimum`
+      if [[ $quota_minimum_dehumanise -lt $dossier_source_dehumanise ]]; then
+        eval 'echo -e "[\e[42m\u2713 \e[0m] Traitement en cours dans "$dossier_source' $mon_log_perso
+        maj_necessaire="1"
+        filebot -script fn:amc --db $agent -non-strict --conflict override --lang fr --encoding UTF-8 --mode rename "$dossier_source" --def "$format=$dossier_cible/$output" > filebot.txt 2>/dev/null &
+        pid=$!
+        spin='-\|/'
+        i=0
+        while kill -0 $pid 2>/dev/null
+        do
+        i=$(( (i+1) %4 ))
+        printf "\rChargement... ${spin:$i:1}"
+        sleep .1
+        done
+        printf "\r"
+        sed -i '/MOVE/!d' filebot.txt
+        media_fait=()
+        while IFS= read -r -d $'\n'; do
+        media_fait+=("$REPLY")
+        done <filebot.txt
+        rm -f filebot.txt
+        for h in "${media_fait[@]}"; do
+          filebot_source=`echo $h | grep "MOVE" | cut -d'[' -f3- | sed 's/] to .*//g'`
+          nombre_crochet=`echo $h | grep -o "\[" | wc -m`
+          if [[ "$nombre_crochet" == "6" ]]; then
+            filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f4 | sed 's/].*//g'`
+          fi
+          if [[ "$nombre_crochet" == "8" ]]; then
+            filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f5 | sed 's/].*//g'`
+          fi
+          if [[ "$nombre_crochet" == "10" ]]; then
+            filebot_cible=`echo $h | grep "MOVE" | cut -d'[' -f6 | sed 's/].*//g'`
+          fi
+          eval 'echo "     Fichier: "$filebot_source' $mon_log_perso
+          eval 'echo "     ... renommé/déplacé: "$filebot_cible' $mon_log_perso
+        done
+      else
+        eval 'echo -e "[\e[41m\u2717 \e[0m] Traitement non effectué dans "$dossier_source" : quota insuffisant"' $mon_log_perso
+      fi
     else
       eval 'echo -e "[\e[41m\u2717 \e[0m] Aucun média détecté dans "$dossier_source' $mon_log_perso
     fi
