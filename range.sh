@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.16" #base du système de mise à jour
+version="Version: 2.0.0.17" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -23,8 +23,8 @@ lien_filebot="https://github.com/Z0uZOU/Range/tree/master/FileBot" #lien vers l'
 ########################
  
 #### Vérification de la langue du system
-if [[ "$@" =~ "--langue=FR" ]] || [[ "$@" =~ "--langue=ENG" ]]; then
-  if [[ "$@" =~ "--langue=FR" ]]; then
+if [[ "$1" == "--langue=FR" ]] || [[ "$1" == "--langue=ENG" ]]; then
+  if [[ "$1" == "--langue=FR" ]]; then
     affichage_langue="french"
   else
     affichage_langue="english"
@@ -154,139 +154,141 @@ for process_travail in $verification_process ; do
 done
 
 #### Tests des arguments
-if [[ "$1" == "--version" ]]; then
-  echo "$version"
-  exit 1
-fi
-if [[ "$1" == "--debug" ]] || [[ "$2" == "--debug" ]]; then
-  debug="yes"
-fi
-if [[ "$1" == "--edit-config" ]]; then
-  nano $mon_script_config
-  exit 1
-fi
-if [[ "$1" == "--efface-lock" ]]; then
-  mon_lock=`echo "/root/.config/"$mon_script_base"/lock-"$mon_script_base`
-  rm -f "$mon_lock"
-  echo "Fichier lock effacé"
-  exit 1
-fi
-if [[ "$1" == "--statut-lock" ]]; then
-  statut_lock=`cat $mon_script_config | grep "maj_force=\"oui\""`
-  if [[ "$statut_lock" == "" ]]; then
-    echo "Système de lock activé"
-  else
-    echo "Système de lock désactivé"
+for parametre in $@; do
+  if [[ "$parametre" == "--version" ]]; then
+    echo "$version"
+    exit 1
   fi
-  exit 1
-fi
-if [[ "$1" == "--active-lock" ]]; then
-  sed -i 's/maj_force="oui"/maj_force="non"/g' $mon_script_config
-  echo "Système de lock activé"
-  exit 1
-fi
-if [[ "$1" == "--desactive-lock" ]]; then
-  sed -i 's/maj_force="non"/maj_force="oui"/g' $mon_script_config
-  echo "Système de lock désactivé"
-  exit 1
-fi
-if [[ "$1" == "--extra-log" ]] || [[ "$2" == "--extra-log" ]]; then
-  date_log=`date +%Y%m%d`
-  heure_log=`date +%H%M`
-  path_log=`echo "/root/.config/"$mon_script_base"/log/"$date_log`
-  mkdir -p $path_log 2>/dev/null
-  fichier_log_perso=`echo $path_log"/"$heure_log".log"`
-  mon_log_perso="| tee -a $fichier_log_perso"
-fi
-if [[ "$1" == "--purge-process" ]]; then
-  ps aux | grep $mon_script_base | awk '{print $2}' | xargs kill -9
-  echo "Les processus de ce script ont été tués"
-fi
-if [[ "$1" == "--purge-log" ]]; then
-  path_global_log=`echo "/root/.config/"$mon_script_base"/log"`
-  cd $path_global_log
-  mon_chemin=`echo $PWD`
-  if [[ "$mon_chemin" == "$path_global_log" ]]; then
-    printf "Êtes-vous sûr de vouloir effacer l'intégralité des logs de --extra-log? (oui/non) : "
-    read question_effacement
-    if [[ "$question_effacement" == "oui" ]]; then
-      rm -rf *
-      echo "Les logs ont été effacés"
+  if [[ "$parametre" == "--debug" ]]; then
+    debug="yes"
+  fi
+  if [[ "$parametre" == "--edit-config" ]]; then
+    nano $mon_script_config
+    exit 1
+  fi
+  if [[ "$parametre" == "--efface-lock" ]]; then
+    mon_lock=`echo "/root/.config/"$mon_script_base"/lock-"$mon_script_base`
+    rm -f "$mon_lock"
+    echo "Fichier lock effacé"
+    exit 1
+  fi
+  if [[ "$parametre" == "--statut-lock" ]]; then
+    statut_lock=`cat $mon_script_config | grep "maj_force=\"oui\""`
+    if [[ "$statut_lock" == "" ]]; then
+      echo "Système de lock activé"
+    else
+      echo "Système de lock désactivé"
     fi
-  else
-    echo "Une erreur est survenue, veuillez contacter le développeur"
-  fi
-  exit 1
-fi
-if [[ "$1" == "--changelog" ]]; then
-  wget -q -O- $changelog_github
-  echo ""
-  exit 1
-fi
-if [[ "$1" == --message=* ]]; then
-  source $mon_script_config
-  message=`echo "$1" | sed 's/--message=//g'`
-  curl -s \
-    --form-string "token=ansxn5akcp72c47i9g1safyjdxqd1w" \
-    --form-string "user=use32hsG26Ti2jkmSpX7YteA12DkQr" \
-    --form-string "title=$mon_script_base_maj MESSAGE" \
-    --form-string "message=$message" \
-    --form-string "html=1" \
-    --form-string "priority=0" \
-    https://api.pushover.net/1/messages.json > /dev/null
-  exit 1
-fi
-if [[ "$1" == "--help" ]]; then
-  if [[ "$CHECK_MUI" != "" ]]; then
-    i=""
-    for i in _ {a..z} {A..Z}; do eval "echo \${!$i@}" ; done | xargs printf "%s\n" | grep mui_menu_help > variables
-    help_lignes=`wc -l variables | awk '{print $1}'`
-    rm -f variables
-    j=""
-    mui_menu_help="mui_menu_help_"
-    path_log=`echo "/root/.config/"$mon_script_base"/log/"$date_log`
-    for j in $(seq 1 $help_lignes); do
-      source $mon_script_langue
-      mui_menu_help_display=`echo -e "$mui_menu_help$j"`
-      echo -e "${!mui_menu_help_display}"
-    done
     exit 1
   fi
-  if [[ "$CHECK_MUI" == "" ]]; then
+  if [[ "$parametre" == "--active-lock" ]]; then
+    sed -i 's/maj_force="oui"/maj_force="non"/g' $mon_script_config
+    echo "Système de lock activé"
+    exit 1
+  fi
+  if [[ "$parametre" == "--desactive-lock" ]]; then
+    sed -i 's/maj_force="non"/maj_force="oui"/g' $mon_script_config
+    echo "Système de lock désactivé"
+    exit 1
+  fi
+  if [[ "$parametre" == "--extra-log" ]]; then
+    date_log=`date +%Y%m%d`
+    heure_log=`date +%H%M`
     path_log=`echo "/root/.config/"$mon_script_base"/log/"$date_log`
-    echo -e "\e[1m$mon_script_base_maj\e[0m ($version)"
-    echo "Objectif du programme: $description"
-    echo "Auteur: Sc00nY <scoonydeus@gmail.com>"
-    echo ""
-    echo "Utilisation: \"$mon_script_fichier [--option]\""
-    echo ""
-    echo -e "\e[4mOptions:\e[0m"
-    echo "  --version               Affiche la version de ce programme"
-    echo "  --edit-config           Édite la configuration de ce programme"
-    echo "  --extra-log             Génère un log à chaque exécution dans "$path_log
-    echo "  --debug                 Lance ce programme en mode debug"
-    echo "  --efface-lock           Supprime le fichier lock qui empêche l'exécution"
-    echo "  --statut-lock           Affiche le statut de la vérification de process doublon"
-    echo "  --active-lock           Active le système de vérification de process doublon"
-    echo "  --desactive-lock        Désactive le système de vérification de process doublon"
-    echo "  --maj-uniquement        N'exécute que la mise à jour"
-    echo "  --changelog             Affiche le changelog de ce programme"
-    echo "  --help                  Affiche ce menu"
-    echo ""
-    echo "Les options \"--debug\" et \"--extra-log\" sont cumulables"
-    echo ""
-    echo -e "\e[4mUtilisation avancée:\e[0m"
-    echo "  --message=\"...\"         Envoie un message push au développeur (urgence uniquement)"
-    echo "  --purge-log             Purge définitivement les logs générés par --extra-log"
-    echo "  --purge-process         Tue tout les processus générés par ce programme"
-    echo ""
-    echo -e "\e[3m ATTENTION: CE PROGRAMME DOIT ÊTRE EXÉCUTÉ AVEC LES PRIVILÈGES ROOT \e[0m"
-    echo "Des commandes comme les installations de dépendances ou les recherches nécessitent de tels privilèges."
+    mkdir -p $path_log 2>/dev/null
+    fichier_log_perso=`echo $path_log"/"$heure_log".log"`
+    mon_log_perso="| tee -a $fichier_log_perso"
+  fi
+  if [[ "$parametre" == "--purge-process" ]]; then
+    ps aux | grep $mon_script_base | awk '{print $2}' | xargs kill -9
+    echo "Les processus de ce script ont été tués"
+  fi
+  if [[ "$parametre" == "--purge-log" ]]; then
+    path_global_log=`echo "/root/.config/"$mon_script_base"/log"`
+    cd $path_global_log
+    mon_chemin=`echo $PWD`
+    if [[ "$mon_chemin" == "$path_global_log" ]]; then
+      printf "Êtes-vous sûr de vouloir effacer l'intégralité des logs de --extra-log? (oui/non) : "
+      read question_effacement
+      if [[ "$question_effacement" == "oui" ]]; then
+        rm -rf *
+        echo "Les logs ont été effacés"
+      fi
+    else
+      echo "Une erreur est survenue, veuillez contacter le développeur"
+    fi
+    exit 1
+  fi
+  if [[ "$parametre" == "--changelog" ]]; then
+    wget -q -O- $changelog_github
     echo ""
     exit 1
   fi
-fi
- 
+  if [[ "$parametre" == --message=* ]]; then
+    source $mon_script_config
+    message=`echo "$parametre" | sed 's/--message=//g'`
+    curl -s \
+      --form-string "token=ansxn5akcp72c47i9g1safyjdxqd1w" \
+      --form-string "user=use32hsG26Ti2jkmSpX7YteA12DkQr" \
+      --form-string "title=$mon_script_base_maj MESSAGE" \
+      --form-string "message=$message" \
+      --form-string "html=1" \
+      --form-string "priority=0" \
+      https://api.pushover.net/1/messages.json > /dev/null
+    exit 1
+  fi
+  if [[ "$parametre" == "--help" ]]; then
+    if [[ "$CHECK_MUI" != "" ]]; then
+      i=""
+      for i in _ {a..z} {A..Z}; do eval "echo \${!$i@}" ; done | xargs printf "%s\n" | grep mui_menu_help > variables
+      help_lignes=`wc -l variables | awk '{print $1}'`
+      rm -f variables
+      j=""
+      mui_menu_help="mui_menu_help_"
+      path_log=`echo "/root/.config/"$mon_script_base"/log/"$date_log`
+      for j in $(seq 1 $help_lignes); do
+        source $mon_script_langue
+        mui_menu_help_display=`echo -e "$mui_menu_help$j"`
+        echo -e "${!mui_menu_help_display}"
+      done
+      exit 1
+    fi
+    if [[ "$CHECK_MUI" == "" ]]; then
+      path_log=`echo "/root/.config/"$mon_script_base"/log/"$date_log`
+      echo -e "\e[1m$mon_script_base_maj\e[0m ($version)"
+      echo "Objectif du programme: $description"
+      echo "Auteur: Sc00nY <scoonydeus@gmail.com>"
+      echo ""
+      echo "Utilisation: \"$mon_script_fichier [--option]\""
+      echo ""
+      echo -e "\e[4mOptions:\e[0m"
+      echo "  --version               Affiche la version de ce programme"
+      echo "  --edit-config           Édite la configuration de ce programme"
+      echo "  --extra-log             Génère un log à chaque exécution dans "$path_log
+      echo "  --debug                 Lance ce programme en mode debug"
+      echo "  --efface-lock           Supprime le fichier lock qui empêche l'exécution"
+      echo "  --statut-lock           Affiche le statut de la vérification de process doublon"
+      echo "  --active-lock           Active le système de vérification de process doublon"
+      echo "  --desactive-lock        Désactive le système de vérification de process doublon"
+      echo "  --maj-uniquement        N'exécute que la mise à jour"
+      echo "  --changelog             Affiche le changelog de ce programme"
+      echo "  --help                  Affiche ce menu"
+      echo ""
+      echo "Les options \"--debug\" et \"--extra-log\" sont cumulables"
+      echo ""
+      echo -e "\e[4mUtilisation avancée:\e[0m"
+      echo "  --message=\"...\"         Envoie un message push au développeur (urgence uniquement)"
+      echo "  --purge-log             Purge définitivement les logs générés par --extra-log"
+      echo "  --purge-process         Tue tout les processus générés par ce programme"
+      echo ""
+      echo -e "\e[3m ATTENTION: CE PROGRAMME DOIT ÊTRE EXÉCUTÉ AVEC LES PRIVILÈGES ROOT \e[0m"
+      echo "Des commandes comme les installations de dépendances ou les recherches nécessitent de tels privilèges."
+      echo ""
+      exit 1
+    fi
+  fi
+done
+  
 #### je dois charger le fichier conf ici ou trouver une solution (script_url et maj_force)
 dossier_config=`echo "/root/.config/"$mon_script_base`
 if [[ -d "$dossier_config" ]]; then
@@ -497,34 +499,34 @@ if [[ "$@" == "--maj-uniquement" ]]; then
 fi
 
 #### Vérification de la conformité du cron
-crontab -l > mon_cron.txt
-cron_path=`cat mon_cron.txt | grep "PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"`
+crontab -l > $dossier_config/mon_cron.txt
+cron_path=`cat $dossier_config/mon_cron.txt | grep "PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"`
 if [[ "$cron_path" == "" ]]; then
-  sed -i '1iPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' mon_cron.txt
+  sed -i '1iPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' $dossier_config/mon_cron.txt
   cron_a_appliquer="oui"
 fi
 if [[ "$affichage_langue" == "french" ]]; then
-  cron_lang=`cat mon_cron.txt | grep "LANG=fr_FR.UTF-8"`
+  cron_lang=`cat $dossier_config/mon_cron.txt | grep "LANG=fr_FR.UTF-8"`
 else
-  cron_lang=`cat mon_cron.txt | grep "LANG=en_US.UTF-8"`
+  cron_lang=`cat $dossier_config/mon_cron.txt | grep "LANG=en_US.UTF-8"`
 fi
 if [[ "$cron_lang" == "" ]]; then
   if [[ "$affichage_langue" == "french" ]]; then
-    sed -i '1iLANG=fr_FR.UTF-8' mon_cron.txt
+    sed -i '1iLANG=fr_FR.UTF-8' $dossier_config/mon_cron.txt
     cron_a_appliquer="oui"
   else
-    sed -i '1iLANG=en_US.UTF-8' mon_cron.txt
+    sed -i '1iLANG=en_US.UTF-8' $dossier_config/mon_cron.txt
     cron_a_appliquer="oui"
   fi
 fi
-cron_variable=`cat mon_cron.txt | grep "CRON_SCRIPT=\"oui\""`
+cron_variable=`cat $dossier_config/mon_cron.txt | grep "CRON_SCRIPT=\"oui\""`
 if [[ "$cron_variable" == "" ]]; then
-  sed -i '1iCRON_SCRIPT="oui"' mon_cron.txt
+  sed -i '1iCRON_SCRIPT="oui"' $dossier_config/mon_cron.txt
   cron_a_appliquer="oui"
 fi
 if [[ "$cron_a_appliquer" == "oui" ]]; then
-  crontab mon_cron.txt
-  rm -f mon_cron.txt
+  crontab $dossier_config/mon_cron.txt
+  rm -f $dossier_config/mon_cron.txt
   if [[ "$CHECK_MUI" != "" ]]; then
     source $mon_script_langue
     eval 'echo -e "$mui_cron_path_updated"' $mon_log_perso
@@ -532,7 +534,7 @@ if [[ "$cron_a_appliquer" == "oui" ]]; then
     eval 'echo "-- Cron mis en conformité"' $mon_log_perso
   fi
 else
-  rm -f mon_cron.txt
+  rm -f $dossier_config/mon_cron.txt
 fi
 
 #### Mise en place éventuelle d'un cron
@@ -555,10 +557,10 @@ if [[ "$script_cron" != "" ]]; then
     else
       eval 'echo "-- Mise en place dans le cron..."' $mon_log_perso
     fi
-    crontab -l > mon_cron.txt
-    echo -e "$ajout_cron" >> mon_cron.txt
-    crontab mon_cron.txt
-    rm -f mon_cron.txt
+    crontab -l > $dossier_config/mon_cron.txt
+    echo -e "$ajout_cron" >> $dossier_config/mon_cron.txt
+    crontab $dossier_config/mon_cron.txt
+    rm -f $dossier_config/mon_cron.txt
     if [[ "$CHECK_MUI" != "" ]]; then
       source $mon_script_langue
       eval 'echo -e "$mui_no_cron_updated"' $mon_log_perso
@@ -567,7 +569,6 @@ if [[ "$script_cron" != "" ]]; then
     fi
   else
     if [[ "${verif_cron:0:1}" == "#" ]]; then
- 
       if [[ "$CHECK_MUI" != "" ]]; then
         source $mon_script_langue
         my_title_count=`echo -n "$mui_script_in_cron_disable" | sed "s/\\\e\[[0-9]\{1,2\}m//g" | wc -c`
@@ -588,7 +589,6 @@ if [[ "$script_cron" != "" ]]; then
       else
         eval 'echo -e "\e[101mLE SCRIPT EST PRÉSENT DANS LE CRON MAIS DÉSACTIVÉ\e[0m"' $mon_log_perso
       fi
-
     else
       if [[ "$CHECK_MUI" != "" ]]; then
         source $mon_script_langue
