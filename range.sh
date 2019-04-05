@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.18" #base du système de mise à jour
+version="Version: 2.0.0.19" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -990,20 +990,26 @@ maj_necessaire="0"
 
 if [[ "$display_dependencies" == "yes" ]] || [[ "$affiche_dependances" == "oui" ]]; then
 #### Vérification de FileBot
-  wget -O- -q $lien_filebot > $dossier_config/filebot.txt &
-  pid=$!
-  spin='-\|/'
-  i=0
-  while kill -0 $pid 2>/dev/null
-  do
+  filebot_present=`filebot -version 2>/dev/null`
+  if [[ "$filebot_present" =~ "FileBot" ]] || [[ "$filebot_present" =~ "Unrecognized option" ]]; then
+    filebot_local=`filebot -version | awk '{print $2}' 2>/dev/null`
+    if [[ "$filebot_present" =~ "Unrecognized option" ]]; then
+      filebot_local="Inconnue"
+    fi
+    echo -e "[\e[42m\u2713 \e[0m] La dépendance: filebot est installée ("$filebot_local")"
+  else
+    wget -O- -q $lien_filebot > $dossier_config/filebot.txt &
+    pid=$!
+    spin='-\|/'
+    i=0
+    while kill -0 $pid 2>/dev/null
+    do
     i=$(( (i+1) %4 ))
     printf "\rVérification de la dernière version de FileBot... ${spin:$i:1}"
     sleep .1
-  done
-  printf "$mon_printf" && printf "\r"
-  filebot_distant=`cat $dossier_config/filebot.txt | grep "filebot_" | sed -n '1p' | sed 's/.*filebot_//' | sed 's/_amd64.deb<\/a><\/span>.*//'`
-  filebot_local=`filebot -version | awk '{print $2}' 2>/dev/null`
-  if [[ "$filebot_local" != "$filebot_distant" ]]; then
+    done
+    printf "$mon_printf" && printf "\r"
+    filebot_distant=`cat $dossier_config/filebot.txt | grep "filebot_" | sed -n '1p' | sed 's/.*filebot_//' | sed 's/_amd64.deb<\/a><\/span>.*//'`
     useless="1"
     filebot_lien_download=`cat $dossier_config/filebot.txt | grep "filebot_$filebot_distant" | sed -n '1p' | sed 's/.*href=\"\///' | sed 's/\">.*//' | sed 's/\/blob\//\/raw\//'`
     wget -q -O filebot.deb "https://github.com/$filebot_lien_download" &
@@ -1014,7 +1020,7 @@ if [[ "$display_dependencies" == "yes" ]] || [[ "$affiche_dependances" == "oui" 
     do
       i=$(( (i+1) %4 ))
       printf "\rTéléchargement de la dernière version de FileBot... ${spin:$i:1}"
-       sleep .1
+      sleep .1
     done
     printf "$mon_printf" && printf "\r"
     dpkg -i filebot.deb >/dev/null 2>&1 &
@@ -1029,12 +1035,10 @@ if [[ "$display_dependencies" == "yes" ]] || [[ "$affiche_dependances" == "oui" 
     done
     printf "$mon_printf" && printf "\r"
     rm -f filebot.deb
-    eval 'echo -e "[\e[42m\u2713 \e[0m] FileBot est installé (version "$filebot_distant")"' $mon_log_perso
-  else
-    eval 'echo -e "[\e[42m\u2713 \e[0m] La dépendance: filebot est installée ("$filebot_local")"' $mon_log_perso
+    echo -e "[\e[42m\u2713 \e[0m] FileBot est installé (version "$filebot_distant")"
   fi
   rm -f $dossier_config/filebot.txt
- 
+  
 ## Vérification de Java
   java_local=`java -version 2>&1 >/dev/null | grep 'java version' | awk '{print $3}' | sed -e 's/"//g'`
   if [[ "$java_local" == "" ]]; then
