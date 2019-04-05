@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.17" #base du système de mise à jour
+version="Version: 2.0.0.18" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1353,6 +1353,7 @@ if [[ "$maj_necessaire" == "0" ]] ; then
   fi
   rm -f "$fichier_log_perso"
   dossier_log=`echo $dossier_config"/log"`
+  if [[ ! -d "$dossier_log" ]]; then mkdir -p "$dossier_log"; fi
   find $dossier_log -depth -type d -empty -not -path "$dossier_log" > $dossier_config/dossiers_vides.txt &
   pid=$!
   spin='-\|/'
@@ -1369,7 +1370,7 @@ if [[ "$maj_necessaire" == "0" ]] ; then
     dossiers_vides+=("$REPLY")
   done <$dossier_config/dossiers_vides.txt
   rm -f $dossier_config/dossiers_vides.txt
-  if [[ "${dossiers_vides[@]}" != "" ]]; then
+  if [[ "${dossiers_vides[@]}" != "" ]] 
     echo -e "[\e[41m\u2717 \e[0m] Des dossiers log vides ont été détectés"
     for l in "${dossiers_vides[@]}"; do
       test_source=`echo $l | grep -o $dossier_log`
