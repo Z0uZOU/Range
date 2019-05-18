@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.20" #base du système de mise à jour
+version="Version: 2.0.0.21" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1387,6 +1387,10 @@ if [[ "$maj_necessaire" == "0" ]] ; then
     done
   else
     echo -e "[\e[42m\u2713 \e[0m] Aucun dossier log vide détecté"
+  fi
+else
+  if [[ "$fichier_log_perso" != "" ]]; then
+    cp $fichier_log_perso /var/log/range-last.log
   fi
 fi
 
