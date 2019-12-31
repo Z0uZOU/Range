@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.23" #base du système de mise à jour
+version="Version: 2.0.0.24" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1040,12 +1040,12 @@ if [[ "$display_dependencies" == "yes" ]] || [[ "$affiche_dependances" == "oui" 
   rm -f $dossier_config/filebot.txt
   
 ## Vérification de Java
-  java_local=`java -version 2>&1 >/dev/null | grep 'java version' | awk '{print $3}' | sed -e 's/"//g'`
+  java_local=`java -version 2>&1 >/dev/null | grep 'openjdk version' | awk '{print $3}' | sed -e 's/"//g'`
   if [[ "$java_local" == "" ]]; then
     eval 'echo -e "[\e[41m\u2717 \e[0m] Java est nécessaire... installation lancée"' $mon_log_perso
-    java_repo=`add-apt-repository ppa:webupd8team/java`
+    java_repo=`add-apt-repository ppa:openjdk-r/ppa`
     java_update=`apt update`
-    java_install=`apt install oracle-java8-installer -y`
+    java_install=`apt install openjdk-11-jre -y`
   else
     eval 'echo -e "[\e[42m\u2713 \e[0m] La dépendance: Java est installé ("$java_local")"' $mon_log_perso
   fi
