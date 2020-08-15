@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.24" #base du système de mise à jour
+version="Version: 2.0.0.25" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1420,7 +1420,7 @@ else
   fi
 fi
 if [[ "$maj_necessaire" == "1" ]] && [[ -f "$fichier_log_perso" ]]; then
-  cp $fichier_log_perso /var/log/range-last.log
+  cp $fichier_log_perso /var/log/$mon_script_base-last.log
 fi
 rm "$pid_script"
 
