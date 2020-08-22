@@ -452,6 +452,12 @@ if [[ "$compare" != "" ]] ; then
     echo "mv $mon_script_fichier_temp $mon_script_fichier" >> $mon_script_updater
     echo "chmod +x $mon_script_fichier" >> $mon_script_updater
     echo "chmod 777 $mon_script_fichier" >> $mon_script_updater
+    if [[ "$CHECK_MUI" != "" ]]; then
+      source $mon_script_langue
+      echo "$mui_update_done" >> $mon_script_updater
+    else
+      echo "echo mise à jour mise en place" >> $mon_script_updater
+    fi
     echo "bash $mon_script_fichier $1 $2" >> $mon_script_updater
   else
     echo "shc -f $mon_script_fichier_temp -o $mon_script_fichier" >> $mon_script_updater
