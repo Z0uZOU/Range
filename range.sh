@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.25" #base du système de mise à jour
+version="Version: 2.0.0.26" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -451,6 +451,7 @@ if [[ "$compare" != "" ]] ; then
   if [[ "$mon_script_fichier" =~ \.sh$ ]]; then
     echo "mv $mon_script_fichier_temp $mon_script_fichier" >> $mon_script_updater
     echo "chmod +x $mon_script_fichier" >> $mon_script_updater
+    echo "chmod 777 $mon_script_fichier" >> $mon_script_updater
     echo "bash $mon_script_fichier $1 $2" >> $mon_script_updater
   else
     echo "shc -f $mon_script_fichier_temp -o $mon_script_fichier" >> $mon_script_updater
@@ -458,6 +459,7 @@ if [[ "$compare" != "" ]] ; then
     compilateur=`echo $mon_script_fichier".x.c"`
     echo "rm -f *.x.c" >> $mon_script_updater
     echo "chmod +x $mon_script_fichier" >> $mon_script_updater
+    echo "chmod 777 $mon_script_fichier" >> $mon_script_updater
     if [[ "$CHECK_MUI" != "" ]]; then
       source $mon_script_langue
       echo "$mui_update_done" >> $mon_script_updater
