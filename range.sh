@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.29" #base du système de mise à jour
+version="Version: 2.0.0.30" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1310,7 +1310,7 @@ for dossier in $mes_dossiers_auto ; do
   while kill -0 $pid 2>/dev/null
   do
     i=$(( (i+1) %4 ))
-    printf "\rRecherche en cours dans $dossier_source... ${spin:$i:1}"
+    printf "\r ..  Recherche en cours dans $dossier_source... ${spin:$i:1}"
     sleep .1
   done
   locate -ir /proof$ | sed '#'$dossier_source'#!d' >> $dossier_config/tmpfolder & # -ir : ignore la casse
@@ -1320,7 +1320,7 @@ for dossier in $mes_dossiers_auto ; do
   while kill -0 $pid 2>/dev/null
   do
     i=$(( (i+1) %4 ))
-    printf "\rRecherche en cours dans $dossier_source... ${spin:$i:1}"
+    printf "\r ..  Recherche en cours dans $dossier_source... ${spin:$i:1}"
     sleep .1
   done
   locate -ir \]$ | sed '#'$dossier_source'#!d' >> $dossier_config/tmpfolder & # -ir : ignore la casse
@@ -1330,7 +1330,7 @@ for dossier in $mes_dossiers_auto ; do
   while kill -0 $pid 2>/dev/null
   do
     i=$(( (i+1) %4 ))
-    printf "\rRecherche en cours dans $dossier_source... ${spin:$i:1}"
+    printf "\r ..  Recherche en cours dans $dossier_source... ${spin:$i:1}"
     sleep .1
   done
   find "$dossier_source" -type f \( -iname \*.jpg -o -iname \*.png -o -iname \*.diz -o -iname \*.txt -o -iname \*.nfo -o -iname \*.db \) -print0 > $dossier_config/tmpfile &
@@ -1340,7 +1340,7 @@ for dossier in $mes_dossiers_auto ; do
   while kill -0 $pid 2>/dev/null
   do
     i=$(( (i+1) %4 ))
-    printf "\rRecherche en cours dans $dossier_source... ${spin:$i:1}"
+    printf "\r ..  Recherche en cours dans $dossier_source... ${spin:$i:1}"
     sleep .1
   done
   printf "$mon_printf" && printf "\r"
@@ -1357,7 +1357,7 @@ for dossier in $mes_dossiers_auto ; do
       test_source=`echo $i | grep -o $dossier_source`
       if [[ "$test_source" != "" ]] ; then
         if [[ -d "$i" ]]; then
-          eval 'echo -e "...... suppression de : "$i' $mon_log_perso
+          eval 'echo -e " ..  suppression de : "$i' $mon_log_perso
           rm -rf "$i"
         fi
       fi
@@ -1368,7 +1368,7 @@ for dossier in $mes_dossiers_auto ; do
       test_source=`echo $i | grep -o $dossier_source`
       if [[ "$test_source" != "" ]] ; then
         if [[ -f "$i" ]]; then
-          eval 'echo -e "...... suppression de : "$i' $mon_log_perso
+          eval 'echo -e " ..  suppression de : "$i' $mon_log_perso
           rm -f "$i"
         fi
     fi
@@ -1381,7 +1381,7 @@ for dossier in $mes_dossiers_auto ; do
   while kill -0 $pid 2>/dev/null
   do
     i=$(( (i+1) %4 ))
-    printf "\rRecherche en cours dans $dossier_source ... ${spin:$i:1}"
+    printf "\r ..  Recherche en cours dans $dossier_source ... ${spin:$i:1}"
     sleep .1
   done
   printf "$mon_printf" && printf "\r"
@@ -1394,7 +1394,7 @@ for dossier in $mes_dossiers_auto ; do
       test_source=`echo $l | grep -o $dossier_source`
       if [[ "$test_source" != "" ]] ; then
         if [[ -d "$l" ]]; then
-          eval 'echo -e "...... suppression de : "$l' $mon_log_perso
+          eval 'echo -e " ..  suppression de : "$l' $mon_log_perso
           rmdir "$l"
         fi
       fi
