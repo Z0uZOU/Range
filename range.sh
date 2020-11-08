@@ -1391,12 +1391,11 @@ for dossier in $mes_dossiers_auto ; do
     dossiers_vides+=("$REPLY")
   done <$dossier_config/tmpfolder
   if [[ "${dossiers_vides[@]}" != "" ]]; then
-    eval 'echo -e "[\e[41m\u2717 \e[0m] Des dossiers vides ont été détectés"' $mon_log_perso
     for l in "${dossiers_vides[@]}"; do
       test_source=`echo $l | grep -o $dossier_source`
       if [[ "$test_source" != "" ]] ; then
         if [[ -d "$l" ]]; then
-          eval 'echo -e "   ... suppression de : "$l' $mon_log_perso
+          eval 'echo -e "...... suppression de : "$l' $mon_log_perso
           rmdir "$l"
         fi
       fi
