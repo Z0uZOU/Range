@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.26" #base du système de mise à jour
+version="Version: 2.0.0.27" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -356,7 +356,7 @@ touch $pid_script
 cd /opt/scripts
 
 #### Indispensable aux messages de chargement
-mon_printf="\r                                                            "
+mon_printf="\r                                                                                                               "
 
 #### Nettoyage obligatoire et push pour annoncer la maj
 if [[ -f "$mon_script_updater" ]] ; then
@@ -1293,6 +1293,119 @@ if [[ "$mes_doublons" != "" ]]; then
     rm -f a_supprimer.txt
   done
 fi
+
+## Suppression des fichier inutiles et dossiers vides
+if [[ "$CHECK_MUI" != "" ]]; then
+  source $mon_script_langue
+  eval 'printf  "\e[44m\u2263\u2263  \e[0m \e[44m \e[1m %-62s  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m\n" "$mui_section_nettoyage"' $mon_log_perso
+else
+  eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mNETTOYAGE DES DOSSIERS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
+fi
+for dossier in $mes_dossiers_auto ; do
+  dossier_source=${!dossier}
+  locate -ir /sample$ | sed '#'$dossier_source'#!d' >> $dossier_config/tmpfolder & # -ir : ignore la casse
+  pid=$!
+  spin='-\|/'
+  i=0
+  while kill -0 $pid 2>/dev/null
+  do
+    i=$(( (i+1) %4 ))
+    printf "\rRecherche en cours dans $dossier_source... ${spin:$i:1}"
+    sleep .1
+  done
+  locate -ir /proof$ | sed '#'$dossier_source'#!d' >> $dossier_config/tmpfolder & # -ir : ignore la casse
+  pid=$!
+  spin='-\|/'
+  i=0
+  while kill -0 $pid 2>/dev/null
+  do
+    i=$(( (i+1) %4 ))
+    printf "\rRecherche en cours dans $dossier_source... ${spin:$i:1}"
+    sleep .1
+  done
+  locate -ir \]$ | sed '#'$dossier_source'#!d' >> $dossier_config/tmpfolder & # -ir : ignore la casse
+  pid=$!
+  spin='-\|/'
+  i=0
+  while kill -0 $pid 2>/dev/null
+  do
+    i=$(( (i+1) %4 ))
+    printf "\rRecherche en cours dans $dossier_source... ${spin:$i:1}"
+    sleep .1
+  done
+  find "$dossier_source" -type f \( -iname \*.jpg -o -iname \*.png -o -iname \*.diz -o -iname \*.txt -o -iname \*.nfo-o -iname \*.db \) -print0 >> $dossier_config/tmpfile &
+  pid=$!
+  spin='-\|/'
+  i=0
+  while kill -0 $pid 2>/dev/null
+  do
+    i=$(( (i+1) %4 ))
+    printf "\rRecherche en cours dans $dossier_source... ${spin:$i:1}"
+    sleep .1
+  done
+  printf "$mon_printf" && printf "\r"
+  mes_dossiers_a_supprimer=()
+  mes_fichiers_a_supprimer=()
+  while IFS= read -r -d $'\n'; do
+    mes_dossiers_a_supprimer+=("$REPLY")
+  done <$dossier_config/tmpfolder
+  while IFS= read -r -d $'\0'; do
+    mes_fichiers_a_supprimer+=("$REPLY")
+  done <$dossier_config/tmpfile
+  if [[ $mes_dossiers_a_supprimer != "" ]] ; then
+    for i in "${mes_dossiers_a_supprimer[@]}"; do
+      test_source=`echo $i | grep -o $dossier_source`
+      if [[ "$test_source" != "" ]] ; then
+        if [[ -d "$i" ]]; then
+          eval 'echo -e "...... suppression de : "$i' $mon_log_perso
+          rm -rf "$i"
+        fi
+      fi
+    done
+  fi
+  if [[ $mes_fichiers_a_supprimer != "" ]] ; then
+    for i in "${mes_fichiers_a_supprimer[@]}"; do
+      test_source=`echo $i | grep -o $dossier_source`
+      if [[ "$test_source" != "" ]] ; then
+        if [[ -f "$i" ]]; then
+          eval 'echo -e "...... suppression de : "$i' $mon_log_perso
+          rm -f "$i"
+        fi
+    fi
+    done
+  fi
+  rm -f $dossier_config/tmpfolder
+  find $dossier_source -depth -type d -empty -not -path "$dossier_source" >> $dossier_config/tmpfolder &
+  pid=$!
+  spin='-\|/'
+  i=0
+  while kill -0 $pid 2>/dev/null
+  do
+    i=$(( (i+1) %4 ))
+    printf "\rRecherche en cours dans $dossier_source ... ${spin:$i:1}"
+    sleep .1
+  done
+  printf "$mon_printf" && printf "\r"
+  dossiers_vides=()
+  while IFS= read -r -d $'\n'; do
+    dossiers_vides+=("$REPLY")
+  done <$dossier_config/tmpfolder
+  if [[ "${dossiers_vides[@]}" != "" ]]; then
+    eval 'echo -e "[\e[41m\u2717 \e[0m] Des dossiers vides ont été détectés"' $mon_log_perso
+    for l in "${dossiers_vides[@]}"; do
+      test_source=`echo $l | grep -o $dossier_source`
+      if [[ "$test_source" != "" ]] ; then
+        if [[ -d "$l" ]]; then
+          eval 'echo -e "   ... suppression de : "$l' $mon_log_perso
+          rmdir "$l"
+        fi
+      fi
+    done
+  fi
+  rm -f $dossier_config/tmpfolder
+  rm -f $dossier_config/tmpfile
+done
+eval 'echo -e "[\e[42m\u2713 \e[0m] Procédure de nettoyage terminée"' $mon_log_perso
 
 #### Suppression des dossiers vides
 if [[ "$CHECK_MUI" != "" ]]; then
