@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.31" #base du système de mise à jour
+version="Version: 2.0.0.32" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1179,7 +1179,7 @@ for dossier in $mes_dossiers_auto ; do
         while kill -0 $pid 2>/dev/null
         do
         i=$(( (i+1) %4 ))
-        printf "\rChargement... ${spin:$i:1}"
+        printf "\r ..  Chargement... ${spin:$i:1}"
         sleep .1
         done
         printf "\r"
@@ -1229,7 +1229,7 @@ i=0
 while kill -0 $pid 2>/dev/null
 do
   i=$(( (i+1) %4 ))
-  printf "\rChargement... ${spin:$i:1}"
+  printf "\r ..  Chargement... ${spin:$i:1}"
   sleep .1
 done
 printf "\r"
@@ -1304,8 +1304,7 @@ if [[ "${mes_dossiers_a_nettoyer[@]}" != "" ]]; then
   else
     eval 'echo -e "\e[44m\u2263\u2263  \e[0m \e[44m \e[1mNETTOYAGE DES DOSSIERS  \e[0m \e[44m  \e[0m \e[44m \e[0m \e[34m\u2759\e[0m"' $mon_log_perso
   fi
-  for dossier in $mes_dossiers_a_nettoyer ; do
-    dossier_source=${!dossier}
+  for dossier_source in "${mes_dossiers_a_nettoyer[@]}" ; do
     locate -ir /sample$ | sed '#'$dossier_source'#!d' > $dossier_config/tmpfolder & # -ir : ignore la casse
     pid=$!
     spin='-\|/'
@@ -1313,7 +1312,7 @@ if [[ "${mes_dossiers_a_nettoyer[@]}" != "" ]]; then
     while kill -0 $pid 2>/dev/null
     do
       i=$(( (i+1) %4 ))
-      printf "\r ..  Recherche en cours dans $dossier_source... ${spin:$i:1}"
+      printf "\r ..  Recherche en cours dans $dossier_source ... ${spin:$i:1}"
       sleep .1
     done
     locate -ir /proof$ | sed '#'$dossier_source'#!d' >> $dossier_config/tmpfolder & # -ir : ignore la casse
@@ -1323,7 +1322,7 @@ if [[ "${mes_dossiers_a_nettoyer[@]}" != "" ]]; then
     while kill -0 $pid 2>/dev/null
     do
       i=$(( (i+1) %4 ))
-      printf "\r ..  Recherche en cours dans $dossier_source... ${spin:$i:1}"
+      printf "\r ..  Recherche en cours dans $dossier_source ... ${spin:$i:1}"
       sleep .1
     done
     locate -ir \]$ | sed '#'$dossier_source'#!d' >> $dossier_config/tmpfolder & # -ir : ignore la casse
@@ -1333,7 +1332,7 @@ if [[ "${mes_dossiers_a_nettoyer[@]}" != "" ]]; then
     while kill -0 $pid 2>/dev/null
     do
       i=$(( (i+1) %4 ))
-      printf "\r ..  Recherche en cours dans $dossier_source... ${spin:$i:1}"
+      printf "\r ..  Recherche en cours dans $dossier_source ... ${spin:$i:1}"
       sleep .1
     done
     find "$dossier_source" -type f \( -iname \*.jpg -o -iname \*.png -o -iname \*.diz -o -iname \*.txt -o -iname \*.nfo -o -iname \*.db \) -print0 > $dossier_config/tmpfile &
@@ -1343,7 +1342,7 @@ if [[ "${mes_dossiers_a_nettoyer[@]}" != "" ]]; then
     while kill -0 $pid 2>/dev/null
     do
       i=$(( (i+1) %4 ))
-      printf "\r ..  Recherche en cours dans $dossier_source... ${spin:$i:1}"
+      printf "\r ..  Recherche en cours dans $dossier_source ... ${spin:$i:1}"
       sleep .1
     done
     printf "$mon_printf" && printf "\r"
@@ -1424,7 +1423,7 @@ i=0
 while kill -0 $pid 2>/dev/null
 do
   i=$(( (i+1) %4 ))
-  printf "\rChargement... ${spin:$i:1}"
+  printf "\r ..  Chargement... ${spin:$i:1}"
   sleep .1
 done
 printf "\r"
@@ -1488,7 +1487,7 @@ if [[ "$maj_necessaire" == "0" ]] ; then
   while kill -0 $pid 2>/dev/null
   do
     i=$(( (i+1) %4 ))
-    printf "\rRecherche de dossier(s) log vide(s)... ${spin:$i:1}"
+    printf "\r ..  Recherche de dossier(s) log vide(s)... ${spin:$i:1}"
     sleep .1
   done
   printf "$mon_printf" && printf "\r"
