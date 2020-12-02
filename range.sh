@@ -6,7 +6,7 @@
 ## Installation bin: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && shc -f range.sh -o range.bin && chmod +x range.bin && rm -f *.x.c && rm -f range.sh
 ## Installation sh: wget -q https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh -O range.sh && sed -i -e 's/\r//g' range.sh && chmod +x range.sh
 ## Micro-config
-version="Version: 2.0.0.32" #base du système de mise à jour
+version="Version: 2.0.0.33" #base du système de mise à jour
 description="Range et renomme les téléchargements" #description pour le menu
 description_eng="" #description pour le menu
 script_github="https://raw.githubusercontent.com/Z0uZOU/Range/master/range.sh" #emplacement du script original
@@ -1466,6 +1466,9 @@ if [[ "$verification_plex" != "" ]]; then
     eval 'echo -e "[\e[41m\u2717 \e[0m] Aucun nouveau média, mise à jour de librairie pas nécessaire"' $mon_log_perso
   fi
 else
+  service plexmediaserver restart
+  my_message=`echo -e "[ <b>ERREUR</b> ] Le serveur est en erreur, redémarrage demandé."`
+  push-message "Range" "$my_message"
   eval 'echo -e "[\e[41m\u2717 \e[0m] Serveur Plex pas lancé"' $mon_log_perso
 fi
 
