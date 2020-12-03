@@ -1,5 +1,5 @@
- #!/bin/bash
- 
+#!/bin/bash
+
 ## MUI installer.sh
 mui_installer_title=" -- INSTALLATION DE RANGE -- "
 mui_installer_fail="[ ERREUR ] EXÉCUTEZ ce script en tant que root!"
@@ -80,7 +80,7 @@ mui_required_pip="[\e[42m\u2713 \e[0m] La dépendance: "$tools_pip" est install�
 mui_creating_menu_entry="... création du menu"
 mui_created_menu_entry="... menu créé"
 mui_creating_menu_folder="... création du dossier du menu"
-mui_end_of_script=" -- FIN DE SCRIPT: $fin_script -- "
+mui_end_of_script=" -- FIN DE SCRIPT: $end_of_script -- "
 
 ## Spécifique à ce script
 mui_section_configuration="VERIFICATION DE LA CONFIGURATION"

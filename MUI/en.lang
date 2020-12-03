@@ -1,5 +1,5 @@
 #!/bin/bash
- 
+
 ## MUI installer.sh
 mui_installer_title=" -- INSTALLATION OF RANGE -- "
 mui_installer_fail="[ FAIL ] RUN this script as root!"
