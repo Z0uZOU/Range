@@ -1,12 +1,10 @@
 #!/bin/bash
 
 ########################
-## Script de Scoony
+## Script de Z0uZOU
 ########################
 ## Micro-config
 version="Version: 3.0" #base du système de mise à jour
-description="Range et renomme les téléchargements" #description pour le menu
-description_eng="Range and rename downloads" #description pour le menu
 icone_github="https://github.com/Z0uZOU/Range/raw/master/.cache-icons/range.png" #emplacement de l'icône du script
 repos_requis="" #ajout de repository
 outils_requis="" #dépendances du script
@@ -24,7 +22,7 @@ else
 fi
 verif_langue=`curl -s "https://raw.githubusercontent.com/Z0uZOU/Range/master/MUI/$affichage_langue.lang"`
 if [[ "$verif_langue" == "404: Not Found" ]]; then
-  affichage_langue="default"
+  affichage_langue="en"
 fi
 
 
@@ -32,11 +30,16 @@ fi
 mon_script_fichier=`basename "$0"`
 mon_script_base=`echo ''$mon_script_fichier | cut -f1 -d'.'''`
 mon_script_base_maj=`echo ${mon_script_base^^}`
-mon_script_config=`echo "/root/.config/"$mon_script_base"/"$mon_script_base".conf"`
-mon_script_langue=`echo "/root/.config/"$mon_script_base"/MUI/"$affichage_langue".lang"`
-mon_script_log=`echo $mon_script_base".log"`
+mon_dossier_config=`echo "/root/.config/"$mon_script_base`
+mon_script_config=`echo $mon_dossier_config"/"$mon_script_base".conf"`
+mon_script_langue=`echo $mon_dossier_config"/MUI/"$affichage_langue".lang"`
 mon_script_desktop=`echo $mon_script_base".desktop"`
 mon_script_updater=`echo $mon_script_base"-update.sh"`
+mon_script_pid=`echo $mon_dossier_config"/lock-"$mon_script_base`
+mon_path_log=`echo $mon_dossier_config"/log"`
+date_log=`date +%Y%m%d`
+heure_log=`date +%H%M`
+mon_fichier_log=`echo $mon_path_log"/"$date_log"/"$heure_log".log"`
 
 
 #### Vérification que le script possède les droits root
@@ -71,6 +74,7 @@ source $mon_script_langue
 push-message() {
   push_title=$1
   push_content=$2
+  push_priority=$3
   for user in {1..10}; do
     destinataire=`eval echo "\\$destinataire_"$user`
     if [ -n "$destinataire" ]; then
@@ -80,7 +84,7 @@ push-message() {
         --form-string "title=$push_title" \
         --form-string "message=$push_content" \
         --form-string "html=1" \
-        --form-string "priority=0" \
+        --form-string "priority=$push_priority" \
         https://api.pushover.net/1/messages.json > /dev/null
     fi
   done
@@ -95,7 +99,7 @@ for process_travail in $verification_process ; do
       echo "$process_travail $mui_prevent_dupe_task"
       end_of_script=`date`
       source $mon_script_langue
-      my_title_count=`echo -n "$mui_end_of_script" | sed "s/\\\e\[[0-9]\{1,2\}m//g" | sed 's/é/e/g' | wc -c`
+      my_title_count=`echo -n "$mui_end_of_script" | sed 's/é/e/g' | wc -c`
       line_lengh="78"
       before_count=$((($line_lengh-$my_title_count)/2))
       after_count=$(((($line_lengh-$my_title_count)%2)+$before_count))
@@ -107,4 +111,158 @@ for process_travail in $verification_process ; do
   fi
 done
 
-echo "Title :$mui_title"
+
+#### Tests des arguments
+for parametre in $@; do
+  if [[ "$parametre" == "--debug" ]]; then
+    debug="yes"
+  fi
+  if [[ "$parametre" == "--edit-config" ]]; then
+    nano $mon_script_config
+    exit 1
+  fi
+  if [[ "$parametre" == "--efface-lock" ]]; then
+    mon_lock=`echo $mon_dossier_config"/lock-"$mon_script_base`
+    rm -f "$mon_lock"
+    echo "Fichier lock effacé"
+    exit 1
+  fi
+  if [[ "$parametre" == "--statut-lock" ]]; then
+    statut_lock=`cat $mon_script_config | grep "maj_force=\"oui\""`
+    if [[ "$statut_lock" == "" ]]; then
+      echo "Système de lock activé"
+    else
+      echo "Système de lock désactivé"
+    fi
+    exit 1
+  fi
+  if [[ "$parametre" == "--active-lock" ]]; then
+    sed -i 's/maj_force="oui"/maj_force="non"/g' $mon_script_config
+    echo "Système de lock activé"
+    exit 1
+  fi
+  if [[ "$parametre" == "--desactive-lock" ]]; then
+    sed -i 's/maj_force="non"/maj_force="oui"/g' $mon_script_config
+    echo "Système de lock désactivé"
+    exit 1
+  fi
+  if [[ "$parametre" == "--extra-log" ]]; then
+    mon_log_perso="| tee -a $mon_fichier_log"
+  fi
+  if [[ "$parametre" == "--purge-process" ]]; then
+    pgrep -x "$mon_script_fichier" | xargs kill -9
+    echo "Les processus de ce script ont été tués"
+    exit 1
+  fi
+  if [[ "$parametre" == "--purge-log" ]]; then
+    cd $mon_path_log
+    mon_chemin=`echo $PWD`
+    if [[ "$mon_chemin" == "$mon_path_log" ]]; then
+      printf "Êtes-vous sûr de vouloir effacer l'intégralité des logs de --extra-log? (oui/non) : "
+      read question_effacement
+      if [[ "$question_effacement" == "oui" ]]; then
+        rm -rf *
+        echo "Les logs ont été effacés"
+      fi
+    else
+      echo "Une erreur est survenue, veuillez contacter le développeur"
+    fi
+    exit 1
+  fi
+  if [[ "$parametre" == "--help" ]]; then
+    i=""
+    for i in _ {a..z} {A..Z}; do eval "echo \${!$i@}" ; done | xargs printf "%s\n" | grep mui_menu_help > variables
+    help_lignes=`wc -l variables | awk '{print $1}'`
+    rm -f variables
+    j=""
+    mui_menu_help="mui_menu_help_"
+    for j in $(seq 1 $help_lignes); do
+      source $mon_script_langue
+      mui_menu_help_display=`echo -e "$mui_menu_help$j"`
+      echo -e "${!mui_menu_help_display}"
+    done
+    exit 1
+  fi
+done
+
+#### Chargement du fichier conf si présent
+if [[ -f "$mon_script_config" ]] ; then
+  source $mon_script_config
+fi
+
+#### Vérification qu'au reboot les lock soient bien supprimés
+test_crontab=`crontab -l | grep "clean-lock"`
+if [[ "$test_crontab" == "" ]]; then
+  crontab -l > $dossier_config/mon_cron.txt
+  sed -i '5i@reboot\t\t\tsleep 10 && /opt/scripts/clean-lock.sh' $dossier_config/mon_cron.txt
+  crontab $dossier_config/mon_cron.txt
+  rm -f $dossier_config/mon_cron.txt
+fi
+ 
+#### Vérification qu'une autre instance de ce script ne s'exécute pas
+if [[ "$maj_force" == "non" ]] ; then
+  if [[ -f "$mon_script_pid" ]] ; then
+    computer_name=`hostname`
+    source $mon_script_langue
+    echo "$mui_pid_check"
+    push-message curl "$mon_script_base_maj HS" "$mui_pid_check" "1"
+    exit 1
+  fi
+fi
+touch $mon_script_pid
+
+#### Chemin du script
+## necessaire pour le mettre dans le cron
+cd /opt/scripts
+
+#### Indispensable aux messages de chargement
+mon_printf="\r                                                                                                               "
+
+#### Nettoyage obligatoire et push pour annoncer la maj
+if [[ -f "$mon_script_updater" ]] ; then
+  rm "$mon_script_updater"
+  source $mon_script_config 2>/dev/null
+  version_maj=`echo $version | awk '{print $2}'`
+  if [[ "$CHECK_MUI" != "" ]]; then
+    source $mon_script_langue
+    message_maj=`echo -e "$mui_pushover_updated_msg"`
+    message_titre=`echo -e "$mui_pushover_updated_title"`
+  else
+    message_maj=`echo -e "Le progamme $mon_script_base est désormais en version $version_maj"`
+    message_titre=`echo -e "Mise à jour"`
+  fi  
+  for user in {1..10}; do
+    destinataire=`eval echo "\\$destinataire_"$user`
+    if [ -n "$destinataire" ]; then
+      curl -s \
+      --form-string "token=$token_app" \
+      --form-string "user=$destinataire" \
+      --form-string "title=$message_titre" \
+      --form-string "message=$message_maj" \
+      --form-string "html=1" \
+      --form-string "priority=-1" \
+      https://api.pushover.net/1/messages.json > /dev/null
+    fi
+  done
+fi
+
+
+
+
+end_of_script=`date`
+source $mon_script_langue
+my_title_count=`echo -n "$mui_end_of_script" | sed 's/é/e/g' | wc -c`
+line_lengh="78"
+before_count=$((($line_lengh-$my_title_count)/2))
+after_count=$(((($line_lengh-$my_title_count)%2)+$before_count))
+before=`eval printf "%0.s-" {1..$before_count}`
+after=`eval printf "%0.s-" {1..$after_count}`
+eval 'printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_end_of_script" "$after"' $mon_log_perso
+if [[ "$maj_necessaire" == "1" ]] && [[ -f "$fichier_log_perso" ]]; then
+  cp $fichier_log_perso /var/log/$mon_script_base-last.log
+fi
+rm "$pid_script"
+
+if [[ "$1" == "--menu" ]]; then
+  read -rsp $'Press a key to close the window...\n' -n1 key
+fi
