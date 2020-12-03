@@ -260,6 +260,11 @@ else
 fi
 
 
+#### Nécessaire pour l'argument --maj-uniquement
+if [[ "$@" == "--maj-uniquement" ]]; then
+  rm "$mon_script_pid"
+  exit 1
+fi
 
 
 
