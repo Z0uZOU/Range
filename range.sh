@@ -1172,7 +1172,7 @@ for dossier in $mes_dossiers_auto ; do
       if [[ $quota_minimum_dehumanise -lt $dossier_source_dehumanise ]]; then
         eval 'echo -e "[\e[42m\u2713 \e[0m] Traitement en cours dans "$dossier_source' $mon_log_perso
         maj_necessaire="1"
-        filebot -script fn:amc -non-strict --conflict override --lang fr --encoding UTF-8 --action move "$dossier_source" --def "$format=$output" --output "$dossier_cible" > filebot.txt 2>/dev/null &
+        filebot -script fn:amc -non-strict --conflict override --lang $os_langue --encoding UTF-8 --action move "$dossier_source" --def "$format=$output" --output "$dossier_cible" > filebot.txt 2>/dev/null &
         pid=$!
         spin='-\|/'
         i=0
