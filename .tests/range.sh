@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## SI PAS DE PING SUR TVDB : exit !!!
+
+
 ########################
 ## Script de Z0uZOU
 ########################
@@ -13,6 +16,45 @@ outils_requis_pip="" #dépendances du script (PIP)
 script_cron="*/15 * * * *" #ne définir que la planification
 verification_process="" #si ces process sont détectés on ne notifie pas (ou ne lance pas en doublon)
 ########################
+
+
+#### Vérification de la présence du Net
+net_connection=`ping thetvdb.com -c 1 2>/dev/null | grep "1 received"`
+if [[ "$net_connection" == "" ]]; then
+  mon_dossier_config=`echo "/root/.config/"$mon_script_base`
+  affichage_langue=$(locale | grep LANG | sed -n '1p' | cut -d= -f2 | cut -d_ -f1)
+  mon_script_langue=`echo $mon_dossier_config"/MUI/"$affichage_langue".lang"`
+
+  end_of_script=`date`
+  if [[ ! -f "$mon_script_langue" ]]; then
+    mui_no_connection=" -- No Internet connection -- "
+    mui_end_of_script=" -- END OF SCRIPT: $end_of_script -- "
+  else
+    source $mon_script_langue
+  fi
+  
+  my_title_count=`echo -n "$mui_no_connection" | sed "s/\\\e\[[0-9]\{1,2\}m//g" | wc -c`
+  line_lengh="78"
+  before_count=$((($line_lengh-$my_title_count)/2))
+  after_count=$(((($line_lengh-$my_title_count)%2)+$before_count))
+  before=`eval printf "%0.s-" {1..$before_count}`
+  after=`eval printf "%0.s-" {1..$after_count}`
+  eval 'printf "\e[101m%s%s%s\e[0m\n" "$before" "$mui_no_connection" "$after"' $mon_log_perso
+
+  my_title_count=`echo -n "$mui_end_of_script" | sed "s/\\\e\[[0-9]\{1,2\}m//g" | sed 's/é/e/g' | wc -c`
+  line_lengh="78"
+  before_count=$((($line_lengh-$my_title_count)/2))
+  after_count=$(((($line_lengh-$my_title_count)%2)+$before_count))
+  before=`eval printf "%0.s-" {1..$before_count}`
+  after=`eval printf "%0.s-" {1..$after_count}`
+  eval 'printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_end_of_script" "$after"' $mon_log_perso
+
+  if [[ "$1" == "--menu" ]]; then
+    read -rsp $'Press a key to close the window...\n' -n1 key
+  fi
+  exit 1
+fi
+md5_404_not_found=`curl -s "https://raw.githubusercontent.com/Z0uZOU/Convert2HDLight/master/404" | md5sum  | cut -f1 -d" "`
 
 
 #### Vérification de la langue du system
@@ -65,6 +107,7 @@ if [[ -f "$mon_script_langue" ]]; then
     chmod +x "$mon_script_langue"
   fi
 else
+  mkdir $mon_dossier_config"/MUI"
   wget --quiet "https://raw.githubusercontent.com/Z0uZOU/Range/master/MUI/$affichage_langue.lang" -O "$mon_script_langue"
   chmod +x "$mon_script_langue"
 fi
@@ -111,6 +154,10 @@ for process_travail in $verification_process ; do
     exit 1
   fi
 done
+
+
+#### Initialisation des variables
+no_update="non"
 
 
 #### Tests des arguments
@@ -185,6 +232,9 @@ for parametre in $@; do
     done
     exit 1
   fi
+  if [[ "$parametre" == "--no-update" ]]; then
+    no_update="oui"
+  fi
 done
 
 #### Chargement du fichier conf si présent
@@ -200,13 +250,16 @@ if [[ "$test_crontab" == "" ]]; then
   crontab $dossier_config/mon_cron.txt
   rm -f $dossier_config/mon_cron.txt
 fi
+if [[ ! -f "/opt/scripts/clean-lock.sh" ]]; then
+  wget -q https://raw.githubusercontent.com/Z0uZOU/Convert2HDLight/master/extras/clean-lock.sh -O /opt/scripts/clean-lock.sh && sed -i -e 's/\r//g' /opt/scripts/clean-lock.sh && chmod +x /opt/scripts/clean-lock.sh
+fi
 
 #### Vérification qu'une autre instance de ce script ne s'exécute pas
 if [[ "$maj_force" == "non" ]] ; then
   if [[ -f "$mon_script_pid" ]] ; then
     computer_name=`hostname`
     source $mon_script_langue
-    echo "$mui_pid_check"
+    echo "$mui_pid_check_message"
     push-message "$mui_pid_check_title" "$mui_pid_check" "1"
     exit 1
   fi
@@ -230,34 +283,47 @@ fi
 #### Vérification de version pour éventuelle mise à jour
 distant_md5=`curl -s "$script_github" | md5sum | cut -f1 -d" "`
 local_md5=`md5sum "$0" 2>/dev/null | cut -f1 -d" "`
-if [[ $distant_md5 != $local_md5 ]]; then
-  eval 'echo -e "$mui_update_available"' $mon_log_perso
-  eval 'echo -e "$mui_update_download"' $mon_log_perso
-  touch $mon_script_updater
-  chmod +x $mon_script_updater
-  echo "#!/bin/bash" >> $mon_script_updater
-  mon_script_fichier_temp=`echo $mon_script_fichier"-temp"`
-  echo "wget -q $script_github -O $mon_script_fichier_temp" >> $mon_script_updater
-  echo "sed -i -e 's/\r//g' $mon_script_fichier_temp" >> $mon_script_updater
-  echo "mv $mon_script_fichier_temp $mon_script_fichier" >> $mon_script_updater
-  echo "chmod +x $mon_script_fichier" >> $mon_script_updater
-  echo "chmod 777 $mon_script_fichier" >> $mon_script_updater
-  echo "$mui_update_done" >> $mon_script_updater
-  echo "bash $mon_script_fichier $@" >> $mon_script_updater
-  echo "exit 1" >> $mon_script_updater
-  rm "$mon_script_pid"
-  bash $mon_script_updater
-  exit 1
+if [[ "$md5_404_not_found" != "$distant_md5" ]];then
+  if [[ "$distant_md5" != "$local_md5" ]]; then
+    eval 'echo -e "$mui_update_available"' $mon_log_perso
+    if [[ "$no_update" == "non" ]]; then
+      eval 'echo -e "$mui_update_download"' $mon_log_perso
+      touch $mon_script_updater
+      chmod +x $mon_script_updater
+      echo "#!/bin/bash" >> $mon_script_updater
+      mon_script_fichier_temp=`echo $mon_script_fichier"-temp"`
+      echo "wget -q $script_github -O $mon_script_fichier_temp" >> $mon_script_updater
+      echo "sed -i -e 's/\r//g' $mon_script_fichier_temp" >> $mon_script_updater
+      echo "mv $mon_script_fichier_temp $mon_script_fichier" >> $mon_script_updater
+      echo "chmod +x $mon_script_fichier" >> $mon_script_updater
+      echo "chmod 777 $mon_script_fichier" >> $mon_script_updater
+      echo "$mui_update_done" >> $mon_script_updater
+      echo "bash $mon_script_fichier $@" >> $mon_script_updater
+      echo "exit 1" >> $mon_script_updater
+      rm "$mon_script_pid"
+      bash $mon_script_updater
+      exit 1
+    else
+      eval 'echo -e "$mui_update_not_downloaded"' $mon_log_perso
+    fi
+  fi
 else
-  source $mon_script_langue
-  my_title_count=`echo -n "$mui_title" | sed "s/\\\e\[[0-9]\{1,2\}m//g" | wc -c`
+  my_title_count=`echo -n "$mui_no_connection" | sed "s/\\\e\[[0-9]\{1,2\}m//g" | wc -c`
   line_lengh="78"
   before_count=$((($line_lengh-$my_title_count)/2))
   after_count=$(((($line_lengh-$my_title_count)%2)+$before_count))
   before=`eval printf "%0.s-" {1..$before_count}`
   after=`eval printf "%0.s-" {1..$after_count}`
-  eval 'printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_title" "$after"' $mon_log_perso
+  eval 'printf "\e[101m%s%s%s\e[0m\n" "$before" "$mui_no_connection" "$after"' $mon_log_perso
 fi
+source $mon_script_langue
+my_title_count=`echo -n "$mui_title" | sed "s/\\\e\[[0-9]\{1,2\}m//g" | wc -c`
+line_lengh="78"
+before_count=$((($line_lengh-$my_title_count)/2))
+after_count=$(((($line_lengh-$my_title_count)%2)+$before_count))
+before=`eval printf "%0.s-" {1..$before_count}`
+after=`eval printf "%0.s-" {1..$after_count}`
+eval 'printf "\e[43m%s%s%s\e[0m\n" "$before" "$mui_title" "$after"' $mon_log_perso
 
 
 #### Nécessaire pour l'argument --update
